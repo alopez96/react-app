@@ -1,6 +1,8 @@
 import React from 'react';
-import { StyleSheet, KeyboardAvoidingView  } from 'react-native';
-import { Container, Button, Text } from 'native-base';
+import { StyleSheet, KeyboardAvoidingView, View } from 'react-native';
+import { Container, Button, Text,
+        Form, Item, Input } from 'native-base';
+import axios from 'axios';
 
 class Login extends React.Component {
 
@@ -32,14 +34,48 @@ validateInput = () => {
 }
 
 signInUser = () => {
-  this.props.navigation.navigate('AppScreen')
+  const { email, password } = this.state;
+    axios.post('http://localhost:3000/login', {
+        email: email,
+        password: password
+    })
+    .then(response => {
+    if (response.status == 200) {
+        console.log(response.data)
+        this.props.navigation.navigate('AppScreen');
+      }
+      else{
+        console.log('error', response.status)
+      }
+    })
+    .catch( err => console.log(err));
+  
   }
 
   render() {
     
+    var { email, password } = this.state;
     return (
       <KeyboardAvoidingView style={styles.container}>
-        <Container style={{justifyContent: 'center', alignSelf: 'center'}}> 
+        <Container> 
+        <Form>
+          <Item>
+              <Input placeholder="email"
+              label='email'
+              onChangeText={(email) => this.setState({ email })}
+              value={email}
+                  />
+          </Item>
+          <Item last>
+              <Input placeholder="password"
+              label='password'
+              secureTextEntry
+              onChangeText={(password) => this.setState({ password })}
+              value={password}
+                  />
+          </Item>
+      </Form>
+      <View style={{justifyContent: 'center', alignSelf: 'center'}}>
         <Button style={styles.button}
         onPress={() => this.validateInput() }>
             <Text>Login!</Text>
@@ -48,6 +84,7 @@ signInUser = () => {
         onPress={() => this.props.navigation.navigate('SignupScreen')}>
             <Text>Sign Up!</Text>
           </Button>
+        </View>
         </Container>
       </KeyboardAvoidingView>
     );
