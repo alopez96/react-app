@@ -1,12 +1,19 @@
 import React from 'react';
-import { StyleSheet, Text, View } from 'react-native';
+import { StyleSheet, Text } from 'react-native';
+import { Provider } from 'react-redux';
+import { SafeAreaView } from 'react-navigation';
+import store from './store';
+import SwitchNavigation from './components/route';
 
 export default class App extends React.Component {
   render() {
     return (
-      <View style={styles.container}>
-        <Text>Open up App.js to start working on your app!</Text>
-      </View>
+      <SafeAreaView style={styles.container} 
+      forceInset={{'top': 'never', 'bottom': 'never'}}>
+        <Provider store={store}> 
+          <SwitchNavigation/>
+        </Provider>
+      </SafeAreaView>
     );
   }
 }
@@ -14,8 +21,6 @@ export default class App extends React.Component {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#fff',
-    alignItems: 'center',
-    justifyContent: 'center',
+    backgroundColor: '#fff', 
   },
 });
