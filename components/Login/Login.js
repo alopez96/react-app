@@ -57,7 +57,7 @@ signInUser = () => {
     var { email, password } = this.state;
     return (
       <KeyboardAvoidingView style={styles.container}>
-        <Container> 
+        <Container>
         <Form>
           <Item>
               <Input placeholder="email"

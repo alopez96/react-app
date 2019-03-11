@@ -7,6 +7,7 @@ import { Icon } from 'native-base';
 import Login from './Login/Login';
 import Signup from './SignUp/Signup';
 import Home from './Home/Home';
+import CreatePost from './Post/CreatePost';
 
 
 export const AppBottomNavigator = createBottomTabNavigator({
@@ -19,9 +20,18 @@ export const AppBottomNavigator = createBottomTabNavigator({
                 ),
             }
     },
+    Add:{
+        screen: CreatePost,
+            navigationOptions:{
+                tabBarLabel: () => { },
+                tabBarIcon: ( { tintColor }) => {
+                    <Icon name="ios-add-circle" size={40} color={tintColor} />
+                }
+            }
+    }
     
 },  {
-    order: ['Home']
+    order: ['Home', 'Add']
 })
 
 export const AppStackNavigator = createStackNavigator({

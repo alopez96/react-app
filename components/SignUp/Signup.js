@@ -38,7 +38,8 @@ class Signup extends Component {
     axios.post('http://localhost:3000/register', {
         name: name,
         email: email,
-        password: password
+        password: password,
+        joined: new Date()
     })
     .then(response => {
     if (response.status == 200) {
