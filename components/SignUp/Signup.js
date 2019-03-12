@@ -1,8 +1,10 @@
 import React, { Component } from 'react';
-import { StyleSheet, KeyboardAvoidingView, View } from 'react-native';
+import { StyleSheet, KeyboardAvoidingView, View, Dimensions, Image } from 'react-native';
 import { Container, Button, Text,
         Form, Item, Input } from 'native-base';
 import axios from 'axios';
+
+const { width: WIDTH } = Dimensions.get('window');
 
 class Signup extends Component {
 
@@ -57,7 +59,7 @@ class Signup extends Component {
       var { name, email, password } = this.state;
     return (
         <KeyboardAvoidingView style={styles.container}>
-        <Container> 
+        <Container>
         <Form>
             <Item>
                 <Input placeholder="name"
@@ -87,13 +89,13 @@ class Signup extends Component {
             </Item>
         </Form>
         <View style={{justifyContent: 'center', alignSelf: 'center'}}>
-        <Button style={styles.button}
+        <Button light rounded style={styles.button}
         onPress={() => this.validateInput()}>
             <Text>Register!</Text>
           </Button>
-        <Button transparent style={{margin: 10}}
+        <Button transparent style={styles.button}
         onPress={() => this.props.navigation.navigate('LoginScreen')}>
-            <Text>Go back to Login</Text>
+            <Text style={{color:'#000'}}>Back to Login</Text>
           </Button>
           </View>
         </Container>
@@ -109,8 +111,24 @@ const styles = StyleSheet.create({
   container: {
     flex: 1
   },
-  button: {
-      margin: 20,
-      padding: 10
+  logoContainer: {
+    alignItems: 'center',
+    flexGrow: 1,
+    justifyContent: 'center'
+  },
+  logo: {
+    width: 300,
+    height: 300
   }
+  ,title:{
+      color: '#fff',
+      marginTop: 10,
+      opacity: 0.9
+  },
+  button:{
+    padding: 20,
+    margin: 20,
+    width: WIDTH/2,
+    justifyContent: 'center'
+  },
 })

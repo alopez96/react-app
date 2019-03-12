@@ -1,8 +1,10 @@
 import React from 'react';
-import { StyleSheet, KeyboardAvoidingView, View } from 'react-native';
-import { Container, Button, Text,
+import { StyleSheet, KeyboardAvoidingView, View, Dimensions, Image } from 'react-native';
+import { Button, Text,
         Form, Item, Input } from 'native-base';
 import axios from 'axios';
+
+const { width: WIDTH } = Dimensions.get('window');
 
 class Login extends React.Component {
 
@@ -57,7 +59,11 @@ signInUser = () => {
     var { email, password } = this.state;
     return (
       <KeyboardAvoidingView style={styles.container}>
-        <Container>
+        <View style={styles.logoContainer} >
+              <Image style={styles.logo}
+              source= {require('./../../images/logo.png')}/>
+              <Text style={styles.title} > Unite </Text>
+        </View>
         <Form>
           <Item>
               <Input placeholder="email"
@@ -76,16 +82,15 @@ signInUser = () => {
           </Item>
       </Form>
       <View style={{justifyContent: 'center', alignSelf: 'center'}}>
-        <Button style={styles.button}
+        <Button dark rounded style={styles.button}
         onPress={() => this.validateInput() }>
             <Text>Login!</Text>
           </Button>
         <Button transparent style={styles.button}
         onPress={() => this.props.navigation.navigate('SignupScreen')}>
-            <Text>Sign Up!</Text>
+            <Text style={{color:'#000'}}>Sign Up!</Text>
           </Button>
         </View>
-        </Container>
       </KeyboardAvoidingView>
     );
   }
@@ -96,10 +101,26 @@ export default Login;
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1
+    flex: 1,
+  },
+  logoContainer: {
+    alignItems: 'center',
+    flexGrow: 1,
+    justifyContent: 'center'
+  },
+  logo: {
+    width: 300,
+    height: 300
+  }
+  ,title:{
+      color: '#fff',
+      marginTop: 10,
+      opacity: 0.9
   },
   button:{
     padding: 20,
-    margin: 20
-  }
+    margin: 20,
+    width: WIDTH/2,
+    justifyContent: 'center'
+  },
 });
