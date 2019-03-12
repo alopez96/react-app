@@ -8,6 +8,7 @@ import Login from './Login/Login';
 import Signup from './SignUp/Signup';
 import Home from './Home/Home';
 import CreatePost from './Post/CreatePost';
+import Welcome from './Welcome/Welcome';
 
 
 export const AppBottomNavigator = createBottomTabNavigator({
@@ -35,7 +36,8 @@ export const AppBottomNavigator = createBottomTabNavigator({
 })
 
 export const AppStackNavigator = createStackNavigator({
-    Main: AppBottomNavigator
+    Main: Welcome,
+    Sec: AppBottomNavigator,
 })
 
 
