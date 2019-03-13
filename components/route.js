@@ -36,8 +36,8 @@ export const AppBottomNavigator = createBottomTabNavigator({
 })
 
 export const AppStackNavigator = createStackNavigator({
-    Main: Welcome,
-    Sec: AppBottomNavigator,
+    WelcomeScreen: Welcome,
+    Main: AppBottomNavigator,
 })
 
 

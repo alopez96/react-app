@@ -1,22 +1,30 @@
 import React, { Component } from 'react';
 import { Container, Content, Icon, Picker, Form } from "native-base";
+import { connect } from 'react-redux';
 import UCs from './UCs';
 import CSUs from './CSUs';
+import Interest from './Interest';
 
 class Welcome extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        type: undefined,
-        school: null
+        type: undefined
     };
     this.onValueChange = this.onValueChange.bind(this);
+    this.onInterestChange = this.onInterestChange.bind(this);
   }
 
   onValueChange(value) {
     this.setState({
         type: value
       });
+  }
+
+  onInterestChange(interest){
+    if (interest && interest.length > 0){
+      this.props.navigation.navigate('Main')
+  }
   }
 
   render() {
@@ -42,13 +50,16 @@ class Welcome extends Component {
           </Form>
           {(type == 'UC')
             //UC
-            ? <UCs></UCs>
+            ? <UCs/>
             //CSU
             : ((type == 'CSU')
-                ? <CSUs></CSUs>
+                ? <CSUs/>
                 //none
                 : null
           )}
+          {this.props.school.length > 0
+          ?<Interest onInterestChange={this.onInterestChange}/>
+          :null}
         </Content>
       </Container>
       
@@ -57,5 +68,10 @@ class Welcome extends Component {
 }
 
 
+const mapStateToProps = (state) => {
+  return {
+      school: state.school
+  }
+}
 
-export default (Welcome);
+export default connect(mapStateToProps)(Welcome);
