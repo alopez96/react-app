@@ -3,6 +3,7 @@ import { StyleSheet, KeyboardAvoidingView, View, Dimensions, Image } from 'react
 import { Button, Text,
         Form, Item, Input } from 'native-base';
 import axios from 'axios';
+import { connect } from 'react-redux';
 
 const { width: WIDTH } = Dimensions.get('window');
 
@@ -17,7 +18,6 @@ class Login extends React.Component {
 }
 
 validateInput = () => {
-  console.log('login clicked')
   const { email, password } = this.state;
   let errors = {};
   if (email == null || !email.includes('.edu')){
@@ -43,7 +43,7 @@ signInUser = () => {
     })
     .then(response => {
     if (response.status == 200) {
-        console.log(response.data)
+        this.props.updateUser(response.data.user)
         this.props.navigation.navigate('AppScreen');
       }
       else{
@@ -96,8 +96,19 @@ signInUser = () => {
   }
 }
 
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateUser: (user) => dispatch({
+      type: 'LOAD_USER',
+      payload: {
+        user
+      }
+    })
+  }
+}
 
-export default Login;
+export default connect(null, mapDispatchToProps)(Login);
+
 
 const styles = StyleSheet.create({
   container: {
