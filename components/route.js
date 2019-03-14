@@ -9,6 +9,7 @@ import Signup from './SignUp/Signup';
 import Home from './Home/Home';
 import CreatePost from './Post/CreatePost';
 import Welcome from './Welcome/Welcome';
+import Interest from './Welcome/Interest';
 
 
 export const AppBottomNavigator = createBottomTabNavigator({
@@ -37,6 +38,7 @@ export const AppBottomNavigator = createBottomTabNavigator({
 
 export const AppStackNavigator = createStackNavigator({
     WelcomeScreen: Welcome,
+    InterestScreen: Interest,
     Main: AppBottomNavigator,
 })
 

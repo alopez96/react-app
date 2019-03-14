@@ -4,6 +4,8 @@ import { connect } from 'react-redux';
 import UCs from './UCs';
 import CSUs from './CSUs';
 import Interest from './Interest';
+import Private from './Private';
+import CCs from './CCs';
 
 class Welcome extends Component {
   constructor(props) {
@@ -54,8 +56,14 @@ class Welcome extends Component {
             //CSU
             : ((type == 'CSU')
                 ? <CSUs/>
-                //none
-                : null
+                //private
+                : ((type == 'Private')
+                ? <Private/>
+                //CC
+                : ((type == 'CC')
+                 ? <CCs/>
+                 //none
+                 : null))
           )}
           {this.props.school.length > 0
           ?<Interest onInterestChange={this.onInterestChange}/>

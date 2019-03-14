@@ -35,6 +35,22 @@ class CSUs extends Component {
               <Picker.Item label="CSU Chico" value="CSUC" />
               <Picker.Item label="CSU Dominguez Hills" value="CSUDH" />
               <Picker.Item label="CSU East Bay" value="CSUEB" />
+              <Picker.Item label="CSU Fresno" value="CSUFresno" />
+              <Picker.Item label="CSU Fullerton" value="CSUFuller" />
+              <Picker.Item label="Humboldt State University" value="HumboldtState" />
+              <Picker.Item label="CSU Long Beach" value="CSULB" />
+              <Picker.Item label="CSU Los Angeles" value="CSULA" />
+              <Picker.Item label="CSU Maritime Academy" value="CSUMartitime" />
+              <Picker.Item label="CSU Monterey Bay" value="CSUMonterey" />
+              <Picker.Item label="CSU Northridge" value="CSUNorthridge" />
+              <Picker.Item label="CSU Sacramento" value="CSUSac" />
+              <Picker.Item label="CSU San Bernardino" value="CSUSanBernardino" />
+              <Picker.Item label="San Francisco State University" value="SFState" />
+              <Picker.Item label="San José State University" value="SJSU" />
+              <Picker.Item label="CalPoly San Luis Obispo" value="CalPloySLO" />
+              <Picker.Item label="California State University San Marcos" value="CSU San Marcos" />
+              <Picker.Item label="Sonoma State University" value="SSU" />
+              <Picker.Item label="CSU Stanislaus" value="CSUStanislaus" />
             </Picker>
           </Form>
     );

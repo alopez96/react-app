@@ -1,7 +1,7 @@
 import React from 'react';
 import { StyleSheet, KeyboardAvoidingView, View, Dimensions, Image } from 'react-native';
-import { Button, Text,
-        Form, Item, Input } from 'native-base';
+import { Button, Text, Container, Root,
+        Form, Item, Input, Toast } from 'native-base';
 import axios from 'axios';
 import { connect } from 'react-redux';
 
@@ -15,23 +15,24 @@ class Login extends React.Component {
         email: 'arturo@ucsc.edu',
         password: '123',
     };
+    this.validateInput = this.validateInput.bind(this)
 }
 
 validateInput = () => {
   const { email, password } = this.state;
-  let errors = {};
+  let errors = [];
   if (email == null || !email.includes('.edu')){
-      errors['email'] = 'Email must be an edu email'
-  }
-  if (password == null || password.length < 3){
-      errors['password'] = 'Password must be at least 3 letters'
-      this.setState({ errors });
+      errors.push('Email must be an edu email')
   }
   if (Object.keys(errors).length == 0){
       this.signInUser()
   }
   else {
       console.log(errors)
+      Toast.show({
+        text: errors.toString(),
+        duration: 3000
+      })
   }
 }
 
@@ -43,15 +44,19 @@ signInUser = () => {
     })
     .then(response => {
     if (response.status == 200) {
+      console.log('response', response.data)
         this.props.updateUser(response.data.user)
         this.props.navigation.navigate('AppScreen');
-      }
-      else{
-        console.log('error', response.status)
-      }
+    }
+    else{
+      console.log('login error', response.data)
+      Toast.show({
+        text: response.data,
+        duration: 3000
+      })
+    }
     })
     .catch( err => console.log(err));
-  
   }
 
   render() {
@@ -59,6 +64,7 @@ signInUser = () => {
     var { email, password } = this.state;
     return (
       <KeyboardAvoidingView style={styles.container}>
+      <Root>
         <View style={styles.logoContainer} >
               <Image style={styles.logo}
               source= {require('./../../images/logo.png')}/>
@@ -91,6 +97,7 @@ signInUser = () => {
             <Text style={{color:'#000'}}>Sign Up!</Text>
           </Button>
         </View>
+        </Root>
       </KeyboardAvoidingView>
     );
   }

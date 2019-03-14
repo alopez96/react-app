@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, KeyboardAvoidingView, View, Dimensions, Image } from 'react-native';
-import { Container, Button, Text,
+import { Container, Button, Text, Root, Toast,
         Form, Item, Input } from 'native-base';
 import axios from 'axios';
 
@@ -15,16 +15,17 @@ class Signup extends Component {
         email: '',
         password: ''
     };
+    this.validateInput = this.validateInput.bind(this)
   }
 
   validateInput = () => {
     const { email, password } = this.state;
-    let errors = {};
+    let errors = [];
     if (email == null || !email.includes('.edu')){
-        errors['email'] = 'Email must be an edu email'
+        errors.push('email must be an EDU email')
     }
     if (password == null || password.length < 3){
-        errors['password'] = 'Password must be at least 3 letters'
+        errors.push(' password must be at least 3 letters')
         this.setState({ errors });
     }
     if (Object.keys(errors).length == 0){
@@ -32,6 +33,10 @@ class Signup extends Component {
     }
     else {
         console.log(errors)
+        Toast.show({
+          text: errors.toString(),
+          duration: 3000
+        })
     }
   }
 
@@ -59,6 +64,7 @@ class Signup extends Component {
       var { name, email, password } = this.state;
     return (
         <KeyboardAvoidingView style={styles.container}>
+        <Root>
         <Container>
         <Form>
             <Item>
@@ -99,6 +105,7 @@ class Signup extends Component {
           </Button>
           </View>
         </Container>
+        </Root>
         </KeyboardAvoidingView>
     );
   }
