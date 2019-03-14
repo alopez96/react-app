@@ -16,7 +16,9 @@ class Interest extends Component {
         interest: value
       });
     this.props.updateInterest(value)
-    this.props.onInterestChange(value)
+    if (value && value.length > 0){
+      this.props.navigation.navigate('Main')
+    }
   }
 
   render() {

@@ -23,6 +23,7 @@ class UCs extends Component {
         school: value
       });
       this.props.updateSchoolType(value)
+      this.props.selectSchool(value)
   }
 
   componentDidMount(){
@@ -63,7 +64,7 @@ class UCs extends Component {
           </View>
         </View>
       </TouchableWithoutFeedback>);
-    }
+  }
 
   render() {
     return (

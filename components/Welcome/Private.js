@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
-import { Icon, Picker, Form } from "native-base";
+import { FlatList, ScrollView, RefreshControl, TouchableWithoutFeedback,
+  View, Image, Text, StyleSheet, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
+import axios from 'axios';
+
+const { height: HEIGHT } = Dimensions.get('window');
+const CLUB_HEIGHT = HEIGHT / 4;
 
 class Private extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        school: undefined
+        school: undefined, 
+        category: 'Private',
+        list: []
     };
     this.onValueChange = this.onValueChange.bind(this);
   }
@@ -15,34 +22,68 @@ class Private extends Component {
     this.setState({
         school: value
       });
-      this.props.updateSchoolType(value)
+    this.props.updateSchoolType(value)
+    this.props.selectSchool(value)
+  }
+
+  componentDidMount(){
+    const { category } = this.state;
+    axios.get(`http://localhost:3000/getSchool/${category}`, {
+    
+    })
+    .then(response => {
+    if (response.status == 200) {
+      this.setState({
+        list: response.data
+      })
+    }
+    else{
+      console.log('login error', response.data)
+      Toast.show({
+        text: response.data,
+        duration: 3000
+      })
+    }
+    })
+    .catch( err => console.log(err));
+  }
+
+  renderList = ({item}) => {
+    if (item.empty) {
+      return null;
+    }
+    return (
+      <TouchableWithoutFeedback onPress={() => this.onValueChange(item.name)}
+        style={{ flexDirection: 'row' }}>
+        <View style={styles.eventContainer} >
+          <Image style={styles.containerImage} source={{ uri: item.image }} />
+          <View style={{ margin: 10 }}>
+            <Text allowFontScaling numberOfLines={1}
+              style={styles.eventTitle}> {item.name}
+            </Text>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>);
   }
 
   render() {
     return (
-          <Form>
-            <Picker
-              mode="dropdown"
-              iosHeader="School"
-              placeholder="Select your school"
-              iosIcon={<Icon name="ios-arrow-down" />}
-              style={{ width: undefined }}
-              selectedValue={this.state.school}
-              onValueChange={this.onValueChange}
-            >
-              <Picker.Item label="Santa Clara University" value="SCU" />
-              <Picker.Item label="University of Southern California" value="USF" />
-              <Picker.Item label="San Francisco University" value="SFU" />
-              <Picker.Item label="Brown University" value="Brown" />
-              <Picker.Item label="Columbia University" value="Columbia" />
-              <Picker.Item label="Cornell University" value="Cornell" />
-              <Picker.Item label="DartMouth" value="Darmouth" />
-              <Picker.Item label="Harvard" value="Harvard" />
-              <Picker.Item label="Pennsylvania" value="Pen" />
-              <Picker.Item label="Princeton" value="Princeton" />
-              <Picker.Item label="Yale" value="Yale" />
-            </Picker>
-          </Form>
+      <View>
+      <ScrollView 
+        refreshControl={<RefreshControl
+        refreshing={this.state.loading}
+        onRefresh={this.getUserClubs}/>}
+      >
+        <FlatList
+          data={this.state.list.slice(0, 40)}
+          renderItem={this.renderList}
+          horizontal={false}
+          numColumns={2}
+          keyExtractor={school => school._id}
+          extraData={this.state}
+        />
+      </ScrollView>
+    </View>
     );
   }
 }
@@ -59,4 +100,34 @@ const mapDispatchToProps = (dispatch) => {
   }
   
   
-  export default connect(null, mapDispatchToProps)(Private);
+export default connect(null, mapDispatchToProps)(Private);
+
+const styles = StyleSheet.create({
+  eventContainer: {
+    flex: 1,
+    height: CLUB_HEIGHT,
+    position: 'relative',
+    backgroundColor: '#e8e8e8',
+    marginTop: 20,
+    marginRight: 5,
+    marginLeft: 5,
+    borderRadius: 5,
+  },
+  containerImage: {
+    alignItems: 'center',
+    borderColor: '#d6d7da',
+    flex: 1,
+    borderRadius: 5,
+  },
+  eventTitle: {
+    color: 'black',
+    fontWeight: 'bold',
+    fontSize: 20,
+    textAlign: 'center',
+    textAlignVertical: 'center'
+  },
+  row: {
+    flex: 1,
+    flexDirection: 'row'
+  },
+});

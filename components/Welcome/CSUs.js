@@ -1,12 +1,19 @@
 import React, { Component } from 'react';
-import { Icon, Picker, Form } from "native-base";
+import { FlatList, ScrollView, RefreshControl, TouchableWithoutFeedback,
+  View, Image, Text, StyleSheet, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
+import axios from 'axios';
+
+const { height: HEIGHT } = Dimensions.get('window');
+const CLUB_HEIGHT = HEIGHT / 4;
 
 class CSUs extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        school: undefined
+        school: undefined,
+        category: 'CSU',
+        list: []
     };
     this.onValueChange = this.onValueChange.bind(this);
   }
@@ -16,43 +23,67 @@ class CSUs extends Component {
         school: value
       });
       this.props.updateSchoolType(value)
+      this.props.selectSchool(value)
+  }
+
+  componentDidMount(){
+    const { category } = this.state;
+    axios.get(`http://localhost:3000/getSchool/${category}`, {
+    
+    })
+    .then(response => {
+    if (response.status == 200) {
+      this.setState({
+        list: response.data
+      })
+    }
+    else{
+      console.log('login error', response.data)
+      Toast.show({
+        text: response.data,
+        duration: 3000
+      })
+    }
+    })
+    .catch( err => console.log(err));
+  }
+
+  renderList = ({item}) => {
+    if (item.empty) {
+      return null;
+    }
+    return (
+      <TouchableWithoutFeedback onPress={() => this.onValueChange(item.name)}
+        style={{ flexDirection: 'row' }}>
+        <View style={styles.eventContainer} >
+          <Image style={styles.containerImage} source={{ uri: item.image }} />
+          <View style={{ margin: 10 }}>
+            <Text allowFontScaling numberOfLines={1}
+              style={styles.eventTitle}> {item.name}
+            </Text>
+          </View>
+        </View>
+      </TouchableWithoutFeedback>);
   }
 
   render() {
     return (
-          <Form>
-            <Picker
-              mode="dropdown"
-              iosHeader="School"
-              placeholder="Select your school"
-              iosIcon={<Icon name="ios-arrow-down" />}
-              style={{ width: undefined }}
-              selectedValue={this.state.school}
-              onValueChange={this.onValueChange}
-            >
-              <Picker.Item label="CSU Bakersfield" value="CSUB" />
-              <Picker.Item label="CSU Channel Island" value="CSUCI" />
-              <Picker.Item label="CSU Chico" value="CSUC" />
-              <Picker.Item label="CSU Dominguez Hills" value="CSUDH" />
-              <Picker.Item label="CSU East Bay" value="CSUEB" />
-              <Picker.Item label="CSU Fresno" value="CSUFresno" />
-              <Picker.Item label="CSU Fullerton" value="CSUFuller" />
-              <Picker.Item label="Humboldt State University" value="HumboldtState" />
-              <Picker.Item label="CSU Long Beach" value="CSULB" />
-              <Picker.Item label="CSU Los Angeles" value="CSULA" />
-              <Picker.Item label="CSU Maritime Academy" value="CSUMartitime" />
-              <Picker.Item label="CSU Monterey Bay" value="CSUMonterey" />
-              <Picker.Item label="CSU Northridge" value="CSUNorthridge" />
-              <Picker.Item label="CSU Sacramento" value="CSUSac" />
-              <Picker.Item label="CSU San Bernardino" value="CSUSanBernardino" />
-              <Picker.Item label="San Francisco State University" value="SFState" />
-              <Picker.Item label="San José State University" value="SJSU" />
-              <Picker.Item label="CalPoly San Luis Obispo" value="CalPloySLO" />
-              <Picker.Item label="California State University San Marcos" value="CSU San Marcos" />
-              <Picker.Item label="Sonoma State University" value="SSU" />
-              <Picker.Item label="CSU Stanislaus" value="CSUStanislaus" />
-            </Picker>
-          </Form>
+      <View>
+      <ScrollView 
+        refreshControl={<RefreshControl
+        refreshing={this.state.loading}
+        onRefresh={this.getUserClubs}/>}
+      >
+        <FlatList
+          data={this.state.list.slice(0, 40)}
+          renderItem={this.renderList}
+          horizontal={false}
+          numColumns={2}
+          keyExtractor={school => school._id}
+          extraData={this.state}
+        />
+      </ScrollView>
+    </View>
     );
   }
 }
@@ -70,3 +101,33 @@ const mapDispatchToProps = (dispatch) => {
   
   
   export default connect(null, mapDispatchToProps)(CSUs);
+
+  const styles = StyleSheet.create({
+    eventContainer: {
+      flex: 1,
+      height: CLUB_HEIGHT,
+      position: 'relative',
+      backgroundColor: '#e8e8e8',
+      marginTop: 20,
+      marginRight: 5,
+      marginLeft: 5,
+      borderRadius: 5,
+    },
+    containerImage: {
+      alignItems: 'center',
+      borderColor: '#d6d7da',
+      flex: 1,
+      borderRadius: 5,
+    },
+    eventTitle: {
+      color: 'black',
+      fontWeight: 'bold',
+      fontSize: 20,
+      textAlign: 'center',
+      textAlignVertical: 'center'
+    },
+    row: {
+      flex: 1,
+      flexDirection: 'row'
+    },
+});

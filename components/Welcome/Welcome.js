@@ -14,7 +14,7 @@ class Welcome extends Component {
         type: undefined
     };
     this.onValueChange = this.onValueChange.bind(this);
-    this.onInterestChange = this.onInterestChange.bind(this);
+    this.selectSchool = this.selectSchool.bind(this);
   }
 
   onValueChange(value) {
@@ -23,10 +23,8 @@ class Welcome extends Component {
       });
   }
 
-  onInterestChange(interest){
-    if (interest && interest.length > 0){
-      this.props.navigation.navigate('Main')
-  }
+  selectSchool(value) {
+    this.props.navigation.navigate('InterestScreen')
   }
 
   render() {
@@ -52,22 +50,19 @@ class Welcome extends Component {
           </Form>
           {(type == 'UC')
             //UC
-            ? <UCs/>
+            ? <UCs selectSchool={this.selectSchool}/>
             //CSU
             : ((type == 'CSU')
-                ? <CSUs/>
+                ? <CSUs selectSchool={this.selectSchool}/>
                 //private
                 : ((type == 'Private')
-                ? <Private/>
+                ? <Private selectSchool={this.selectSchool}/>
                 //CC
                 : ((type == 'CC')
-                 ? <CCs/>
+                 ? <CCs selectSchool={this.selectSchool}/>
                  //none
                  : null))
           )}
-          {this.props.school.length > 0
-          ?<Interest onInterestChange={this.onInterestChange}/>
-          :null}
         </Content>
       </Container>
       
