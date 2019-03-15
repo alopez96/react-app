@@ -1,14 +1,22 @@
 import React, { Component } from 'react';
-import { Container, Content, Icon, Picker, Form } from "native-base";
+import { Container, Content, Icon, Picker, Form, Header,
+       Item, Input, Button, Text } from "native-base";
 import Schools from './Schools';
 import axios from 'axios';
+import { connect } from 'react-redux';
+import { screenWidth, screenHeight } from './../Dimensions';
+
+const WIDTH = screenWidth;
+const HEIGHT = screenHeight;
 
 class Welcome extends Component {
   constructor(props) {
     super(props);
     this.state = {
         type: undefined,
-        list: []
+        list: [],
+        nameSearch: '',
+        school: {}
     };
     this.onValueChange = this.onValueChange.bind(this);
     this.selectSchool = this.selectSchool.bind(this);
@@ -19,7 +27,7 @@ class Welcome extends Component {
         type: value
       });
     //fetch the list of schools, based on category
-    axios.get(`http://localhost:3000/getSchool/${value}`, {})
+    axios.get(`http://localhost:3000/getSchools/${value}`, {})
     .then(response => {
       if (response.status == 200) {
         this.setState({
@@ -41,17 +49,52 @@ class Welcome extends Component {
     this.props.navigation.navigate('InterestScreen')
   }
 
+  search = () => {
+    const name = this.state.nameSearch
+    console.log('search', name)
+    //query db for school keyword
+    axios.get(`http://localhost:3000/school/${name}`, {})
+    .then(response => {
+      if (response.status == 200) {
+        if(response.data.school.length == 1){
+          this.props.updateSchool(response.data.school[0]._id)
+        }
+        else if(response.data.school.length < 1){
+          console.log('no result found')
+        }
+      }
+      else{
+        console.log('login error', response.data)
+        Toast.show({
+          text: response.data,
+          duration: 3000
+        })
+      }
+    })
+    .catch( err => console.log(err));
+  }
+
   render() {
     //destruct the state
     const { type, list } = this.state;
     return (
         <Container>
-        <Content>
-          <Form>
+          <Header style={{ marginTop:-35 }}>
+          <Text style={{fontSize: 30, alignSelf:'center'}}>Find your school</Text>
+          </Header>
+          <Item style={{borderRadius:5}}>
+            <Input placeholder="School name"
+              label="nameSearch"
+              onChangeText={(nameSearch) => this.setState({ nameSearch })}
+              value={this.state.nameSearch}/>
+            <Button transparent onPress={() => this.search()}>
+              <Icon name="ios-search" />
+            </Button>
+            <Form>
             <Picker
               mode="dropdown"
               iosHeader="School"
-              placeholder="Select your school type"
+              placeholder="School category"
               iosIcon={<Icon name="ios-arrow-down" />}
               style={{ width: undefined }}
               selectedValue={type}
@@ -63,6 +106,8 @@ class Welcome extends Component {
               <Picker.Item label="Community College" value="CC" />
             </Picker>
           </Form>
+          </Item>      
+        <Content>  
           {type
           ?<Schools selectSchool={this.selectSchool} list={list}/>
           :null}
@@ -73,4 +118,15 @@ class Welcome extends Component {
   }
 }
 
-export default Welcome;
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateSchool: (school) => dispatch({
+      type: 'UPDATE_SCHOOL',
+      payload: {
+        school
+      }
+    })
+  }
+}
+
+export default connect(null, mapDispatchToProps)(Welcome);

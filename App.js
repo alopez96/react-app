@@ -9,7 +9,7 @@ export default class App extends React.Component {
   render() {
     return (
       <SafeAreaView style={styles.container} 
-      forceInset={{'bottom': 'never'}}>
+      forceInset={{'bottom': 'never', 'top': 'never'}}>
         <Provider store={store}> 
           <SwitchNavigation/>
         </Provider>

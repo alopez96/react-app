@@ -19,7 +19,7 @@ class Schools extends Component {
     this.setState({
         school: value
       });
-      this.props.updateSchoolType(value)
+      this.props.updateSchool(value)
       this.props.selectSchool(value)
   }
 
@@ -28,7 +28,7 @@ class Schools extends Component {
       return null;
     }
     return (
-      <TouchableWithoutFeedback onPress={() => this.onValueChange(item.name)}
+      <TouchableWithoutFeedback onPress={() => this.onValueChange(item._id)}
         style={{ flexDirection: 'row' }}>
         <View style={styles.eventContainer} >
           <Image style={styles.containerImage} source={{ uri: item.image }} />
@@ -65,7 +65,7 @@ class Schools extends Component {
 
 const mapDispatchToProps = (dispatch) => {
     return {
-      updateSchoolType: (school) => dispatch({
+      updateSchool: (school) => dispatch({
         type: 'UPDATE_SCHOOL',
         payload: {
           school
