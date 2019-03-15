@@ -1,17 +1,14 @@
 import React, { Component } from 'react';
 import { Container, Content, Icon, Picker, Form } from "native-base";
-import { connect } from 'react-redux';
-import UCs from './UCs';
-import CSUs from './CSUs';
-import Interest from './Interest';
-import Private from './Private';
-import CCs from './CCs';
+import Schools from './Schools';
+import axios from 'axios';
 
 class Welcome extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        type: undefined
+        type: undefined,
+        list: []
     };
     this.onValueChange = this.onValueChange.bind(this);
     this.selectSchool = this.selectSchool.bind(this);
@@ -21,6 +18,23 @@ class Welcome extends Component {
     this.setState({
         type: value
       });
+    //fetch the list of schools, based on category
+    axios.get(`http://localhost:3000/getSchool/${value}`, {})
+    .then(response => {
+      if (response.status == 200) {
+        this.setState({
+          list: response.data
+        })
+      }
+      else{
+        console.log('login error', response.data)
+        Toast.show({
+          text: response.data,
+          duration: 3000
+        })
+      }
+    })
+    .catch( err => console.log(err));
   }
 
   selectSchool(value) {
@@ -28,7 +42,8 @@ class Welcome extends Component {
   }
 
   render() {
-    const { type } = this.state;
+    //destruct the state
+    const { type, list } = this.state;
     return (
         <Container>
         <Content>
@@ -48,21 +63,9 @@ class Welcome extends Component {
               <Picker.Item label="Community College" value="CC" />
             </Picker>
           </Form>
-          {(type == 'UC')
-            //UC
-            ? <UCs selectSchool={this.selectSchool}/>
-            //CSU
-            : ((type == 'CSU')
-                ? <CSUs selectSchool={this.selectSchool}/>
-                //private
-                : ((type == 'Private')
-                ? <Private selectSchool={this.selectSchool}/>
-                //CC
-                : ((type == 'CC')
-                 ? <CCs selectSchool={this.selectSchool}/>
-                 //none
-                 : null))
-          )}
+          {type
+          ?<Schools selectSchool={this.selectSchool} list={list}/>
+          :null}
         </Content>
       </Container>
       
@@ -70,11 +73,4 @@ class Welcome extends Component {
   }
 }
 
-
-const mapStateToProps = (state) => {
-  return {
-      school: state.school
-  }
-}
-
-export default connect(mapStateToProps)(Welcome);
+export default Welcome;

@@ -1,19 +1,16 @@
 import React, { Component } from 'react';
 import { FlatList, ScrollView, RefreshControl, TouchableWithoutFeedback,
-  View, Image, Text, StyleSheet, Dimensions } from 'react-native';
+      View, Image, Text, StyleSheet, Dimensions } from 'react-native';
 import { connect } from 'react-redux';
-import axios from 'axios';
 
 const { height: HEIGHT } = Dimensions.get('window');
 const CLUB_HEIGHT = HEIGHT / 4;
 
-class Private extends Component {
+class Schools extends Component {
   constructor(props) {
     super(props);
     this.state = {
-        school: undefined, 
-        category: 'Private',
-        list: []
+        school: undefined
     };
     this.onValueChange = this.onValueChange.bind(this);
   }
@@ -22,30 +19,8 @@ class Private extends Component {
     this.setState({
         school: value
       });
-    this.props.updateSchoolType(value)
-    this.props.selectSchool(value)
-  }
-
-  componentDidMount(){
-    const { category } = this.state;
-    axios.get(`http://localhost:3000/getSchool/${category}`, {
-    
-    })
-    .then(response => {
-    if (response.status == 200) {
-      this.setState({
-        list: response.data
-      })
-    }
-    else{
-      console.log('login error', response.data)
-      Toast.show({
-        text: response.data,
-        duration: 3000
-      })
-    }
-    })
-    .catch( err => console.log(err));
+      this.props.updateSchoolType(value)
+      this.props.selectSchool(value)
   }
 
   renderList = ({item}) => {
@@ -68,22 +43,22 @@ class Private extends Component {
 
   render() {
     return (
-      <View>
-      <ScrollView 
-        refreshControl={<RefreshControl
-        refreshing={this.state.loading}
-        onRefresh={this.getUserClubs}/>}
-      >
-        <FlatList
-          data={this.state.list.slice(0, 40)}
-          renderItem={this.renderList}
-          horizontal={false}
-          numColumns={2}
-          keyExtractor={school => school._id}
-          extraData={this.state}
-        />
-      </ScrollView>
-    </View>
+          <View>
+            <ScrollView 
+              refreshControl={<RefreshControl
+              refreshing={this.state.loading}
+              onRefresh={this.getUserClubs}/>}
+            >
+              <FlatList
+                data={this.props.list.slice(0, 40)}
+                renderItem={this.renderList}
+                horizontal={false}
+                numColumns={2}
+                keyExtractor={school => school._id}
+                extraData={this.state}
+              />
+            </ScrollView>
+          </View>
     );
   }
 }
@@ -91,7 +66,7 @@ class Private extends Component {
 const mapDispatchToProps = (dispatch) => {
     return {
       updateSchoolType: (school) => dispatch({
-        type: 'SCHOOL_TYPE',
+        type: 'UPDATE_SCHOOL',
         payload: {
           school
         }
@@ -99,8 +74,7 @@ const mapDispatchToProps = (dispatch) => {
     }
   }
   
-  
-export default connect(null, mapDispatchToProps)(Private);
+export default connect(null, mapDispatchToProps)(Schools);
 
 const styles = StyleSheet.create({
   eventContainer: {

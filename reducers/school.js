@@ -1,6 +1,6 @@
 const schoolReducer = (state = [], action) => {
     switch(action.type){
-        case 'SCHOOL_TYPE':{
+        case 'UPDATE_SCHOOL':{
             console.log('school', action.payload.school)
             return action.payload.school
         }
