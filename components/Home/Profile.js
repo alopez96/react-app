@@ -3,11 +3,13 @@ import { View, StyleSheet,
     TouchableOpacity,KeyboardAvoidingView } from 'react-native';
 import { connect } from 'react-redux';
 import Modal from 'react-native-modal';
-import { Thumbnail, Form, Item, Input, Toast, Button, Text, Icon } from 'native-base';
+import { Thumbnail, Form, Item, Input, Toast, Button, Text, Content,
+     Icon, Container, Root } from 'native-base';
 import { RNS3 } from 'react-native-aws3';
 import { ImagePicker, Permissions } from 'expo';
 import { myAccessKey, mySecretKey, awsPrefix } from './../../s3';
 import v1 from 'uuid/v1';
+import axios from 'axios';
 
 class Profile extends Component {
     constructor() {
@@ -18,6 +20,7 @@ class Profile extends Component {
             imageurl: '',
             bio: '',
             isModalVisible: false,
+            uri: 'https://amp.businessinsider.com/images/5c896948daa507206211a3f3-750-375.jpg'
         }
     }
 
@@ -97,8 +100,15 @@ class Profile extends Component {
     })
     .then(response => {
     if (response.status == 200) {
-      console.log('response', response.data)
-        this.props.updateUser(response.data.user)
+        console.log('response', response.data)
+        this.setState({
+            isModalVisible: false
+        })
+        Toast.show({
+            text: 'account updated',
+            duration: 3000,
+            position: "bottom"
+          })
     }
     else{
       console.log('upload error', response.data)
@@ -122,15 +132,17 @@ class Profile extends Component {
     render() {
         const { name, email, bio } = this.state;
         return (
-            <KeyboardAvoidingView behavior='padding' style={styles.container}>
-            <Button style={styles.editButton} 
+            
+            <Container style={styles.container}>
+            <Root>
+            <Content>
+            <Button style={styles.editButton} transparent
                 onPress={this.toogleModal}>
-                <Icon name="ios-create"
-                    style={{color:'black'}}/> 
+                <Text>Edit</Text>
             </Button>
                 <TouchableOpacity style={styles.avatar} 
                     onPress={() => this.onChangePicture()}>
-                    <Thumbnail style={styles.image} source= {{uri: this.state.imageurl}}/>
+                    <Thumbnail style={styles.image} source= {{uri: this.state.uri}}/>
                 </TouchableOpacity>
 
             <Text style={styles.nameText}>{name}</Text>
@@ -141,7 +153,7 @@ class Profile extends Component {
                 </Text>
                 :null
             }              
-
+            </Content>
             <View>
                 <Modal isVisible={this.state.isModalVisible}
                 style={styles.modalStyle}>
@@ -182,8 +194,9 @@ class Profile extends Component {
                 </View>
                 </Modal>
             </View>
-
-    </KeyboardAvoidingView>
+            </Root>
+            </Container>
+    
     );
     }
 }
@@ -207,7 +220,6 @@ const styles = StyleSheet.create({
         borderColor: "#fff",
         marginBottom: 10,
         alignSelf: 'center',
-        position: 'absolute',
         justifyContent: 'center',
         alignItems: 'center',
         marginTop: 110
@@ -229,10 +241,10 @@ const styles = StyleSheet.create({
         fontWeight: 'bold'
     },
     editButton:{
-        backgroundColor:'white',
-        margin: 10,
+        top: 5,
+        right: 5,
         alignSelf: 'flex-end',
-        fontSize: 40
+        position: 'absolute',
     },
     modalStyle:{
         backgroundColor: 'white',
