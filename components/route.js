@@ -10,6 +10,9 @@ import Home from './Home/Home';
 import CreatePost from './Post/CreatePost';
 import Welcome from './Welcome/Welcome';
 import Interest from './Welcome/Interest';
+import Sales from './Home/Sales';
+import OpenForum from './Home/OpenForum';
+import Profile from './Home/Profile';
 
 
 export const AppBottomNavigator = createBottomTabNavigator({
@@ -40,6 +43,9 @@ export const AppStackNavigator = createStackNavigator({
     WelcomeScreen: Welcome,
     InterestScreen: Interest,
     Main: AppBottomNavigator,
+    SalesScreen: Sales,
+    ForumScreen: OpenForum,
+    ProfileScreen: Profile
 })
 
 

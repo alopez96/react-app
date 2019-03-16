@@ -17,7 +17,15 @@ class Interest extends Component {
       });
     this.props.updateInterest(value)
     if (value && value.length > 0){
-      this.props.navigation.navigate('Main')
+      if(value == 'sales'){
+        this.props.navigation.navigate('SalesScreen')
+      }
+      else if(value == 'forum'){
+        this.props.navigation.navigate('ForumScreen')
+      }
+      else{
+        this.props.navigation.navigate('Main')
+      }
     }
   }
 
