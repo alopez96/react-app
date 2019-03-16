@@ -20,7 +20,7 @@ class Profile extends Component {
             imageurl: '',
             bio: '',
             isModalVisible: false,
-            uri: 'https://amp.businessinsider.com/images/5c896948daa507206211a3f3-750-375.jpg'
+            uri: ''
         }
     }
 
@@ -46,9 +46,9 @@ class Profile extends Component {
             name: key
         };
         const options = {
-            keyPrefix: 'uploads/',
-            bucket: 'mentorsdb-images',
-            region: 'us-west-2',
+            keyPrefix: 'profile-images/',
+            bucket: 'react-college',
+            region: 'us-east-2',
             accessKey: myAccessKey,
             secretKey: mySecretKey,
             successActionStatus: 201
@@ -56,6 +56,7 @@ class Profile extends Component {
         await RNS3.put(file, options)
         .progress((e) => console.log(e.loaded / e.total))
         .then((response) => {
+            console.log(response.body)
             this.setState({
                 imageurl: awsPrefix + response.body.postResponse.key
             });
@@ -67,7 +68,8 @@ class Profile extends Component {
   };
 
   uploadImage = (imageurl) => {
-    axios.put('http://localhost:3000/user/:id/uploadImage', {
+    const { _id } = this.props.user;
+    axios.put(`http://localhost:3000/user/${_id}/uploadImage`, {
         imageurl
     })
     .then(response => {
@@ -125,7 +127,8 @@ class Profile extends Component {
         this.setState({
             name: this.props.user.name,
             email: this.props.user.email,
-            bio: this.props.user.bio
+            bio: this.props.user.bio,
+            uri: awsPrefix + this.props.user.imageurl
         })
     }
 
@@ -142,7 +145,8 @@ class Profile extends Component {
             </Button>
                 <TouchableOpacity style={styles.avatar} 
                     onPress={() => this.onChangePicture()}>
-                    <Thumbnail style={styles.image} source= {{uri: this.state.uri}}/>
+                    <Thumbnail style={styles.image} 
+                    source= {{uri: awsPrefix + this.props.user.imageurl }}/>
                 </TouchableOpacity>
 
             <Text style={styles.nameText}>{name}</Text>
