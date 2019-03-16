@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import { Container, Content, Icon, Picker, Form, Header,
     Item, Input, Button, Text, Thumbnail, Left } from "native-base";
 import { StyleSheet, TouchableOpacity } from 'react-native';
-import TopSearchBar from './TopSearchBar';
+import TopSearchBar from '../Home/TopSearchBar';
 
 class Sales extends Component {
   constructor(props) {

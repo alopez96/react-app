@@ -51,7 +51,6 @@ class Welcome extends Component {
 
   search = () => {
     const name = this.state.nameSearch
-    console.log('search', name)
     //query db for school keyword
     axios.get(`http://localhost:3000/school/${name}`, {})
     .then(response => {

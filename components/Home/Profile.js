@@ -56,7 +56,6 @@ class Profile extends Component {
         await RNS3.put(file, options)
         .progress((e) => console.log(e.loaded / e.total))
         .then((response) => {
-            console.log(response.body)
             this.setState({
                 imageurl: awsPrefix + response.body.postResponse.key
             });
@@ -74,7 +73,6 @@ class Profile extends Component {
     })
     .then(response => {
     if (response.status == 200) {
-      console.log('response', response.data)
         this.props.updateUser(response.data.user)
     }
     else{
@@ -102,7 +100,6 @@ class Profile extends Component {
     })
     .then(response => {
     if (response.status == 200) {
-        console.log('response', response.data)
         this.setState({
             isModalVisible: false
         })

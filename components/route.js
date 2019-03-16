@@ -5,19 +5,19 @@ import { createStackNavigator, createAppContainer,
 import { Icon } from 'native-base';
 
 import Login from './Login/Login';
-import Signup from './SignUp/Signup';
+import Signup from './Login/Signup';
 import Home from './Home/Home';
-import CreatePost from './Post/CreatePost';
+import CreateSaleItem from './Sales/CreateSaleItem';
 import Welcome from './Welcome/Welcome';
 import Interest from './Welcome/Interest';
-import Sales from './Home/Sales';
-import OpenForum from './Home/OpenForum';
+import Sales from './Sales/Sales';
+import OpenForum from './OpenForum/OpenForum';
 import Profile from './Home/Profile';
 
 
-export const AppBottomNavigator = createBottomTabNavigator({
-    Home:{
-        screen: Home,
+export const SalesBottomNavigator = createBottomTabNavigator({
+    Sales:{
+        screen: Sales,
             navigationOptions: {
                 tabBarLabel: () => { },
                 tabBarIcon: ({ tintColor }) => (
@@ -26,24 +26,23 @@ export const AppBottomNavigator = createBottomTabNavigator({
             }
     },
     Add:{
-        screen: CreatePost,
-            navigationOptions:{
+        screen: CreateSaleItem,
+            navigationOptions: {
                 tabBarLabel: () => { },
-                tabBarIcon: ( { tintColor }) => {
-                    <Icon name="ios-add-circle" size={40} color={tintColor} />
-                }
+                tabBarIcon: ({ tintColor }) => (
+                    <Icon name="ios-add" size={40} color={tintColor} />
+                ),
             }
-    }
-    
+    },
 },  {
-    order: ['Home', 'Add']
+    order: ['Sales', 'Add']
 })
 
 export const AppStackNavigator = createStackNavigator({
     WelcomeScreen: Welcome,
     InterestScreen: Interest,
-    Main: AppBottomNavigator,
-    SalesScreen: Sales,
+    Main: Home,
+    SalesScreen: SalesBottomNavigator,
     ForumScreen: OpenForum,
     ProfileScreen: Profile
 })

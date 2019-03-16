@@ -44,7 +44,6 @@ signInUser = () => {
     })
     .then(response => {
     if (response.status == 200) {
-      console.log('response', response.data)
         this.props.updateUser(response.data.user)
         this.props.navigation.navigate('AppScreen');
     }
