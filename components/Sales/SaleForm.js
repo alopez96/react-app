@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, View, TouchableOpacity } from 'react-native';
-import { Content, Form, Item,
+import { Content, Form, Item, Root, Toast,
     Textarea, Input, Icon, Thumbnail } from 'native-base';
 import { RNS3 } from 'react-native-aws3';
 import { connect } from 'react-redux';
@@ -65,13 +65,37 @@ useLibraryHandler = async () => {
     };
 };
 
+verifyInput = () => {
+    const { category, title, description } = this.state;
+    let errors = [];
+    if (category.length == 0){
+        errors.push('Category must not be blank')
+    }
+    if (title.length == 0){
+        errors.push('Title must not be blank')
+    }
+    if (description.length == 0){
+        errors.push('Description must not be blank')
+    }
+    if (Object.keys(errors).length == 0){
+        this.createEventAction();
+    }
+    else {
+        console.log(errors)
+        Toast.show({
+            text: errors.toString(),
+            duration: 3000
+        })
+  }
+}
+
 createEventAction = () => {
     const { category, title, description } = this.state;
     axios.post('http://localhost:3000/newSale', {
         category,
         title,
         description,
-        school: this.props.school,
+        schoolid: this.props.school,
         userid: this.props.user._id,
         postDate: new Date(),
         lastDateEdit: new Date(),
@@ -97,6 +121,7 @@ createEventAction = () => {
       const { category, title, description } = this.state;
     return (
         <Content>
+        <Root>
         <Form>
         <Item>
           <Input placeholder="category"
@@ -126,11 +151,12 @@ createEventAction = () => {
             <Icon name="ios-close-circle-outline"
             style={styles.button}/>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => this.createEventAction() }>
+        <TouchableOpacity onPress={() => this.verifyInput() }>
                 <Icon name="ios-checkbox-outline"
                 style={styles.button}/>
         </TouchableOpacity>
         </View>
+    </Root>
     </Content>
     );
   }
