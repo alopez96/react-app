@@ -6,6 +6,8 @@ import TopSearchBar from '../Home/TopSearchBar';
 import axios from 'axios';
 import { connect } from 'react-redux';
 
+import CardComponent from './CardComponent';
+
 class Sales extends Component {
   constructor(props) {
     super(props);
@@ -24,10 +26,10 @@ class Sales extends Component {
     axios.get(`http://localhost:3000/getSales/${schoolid}`, {})
     .then(response => {
       if (response.status == 200) {
-        console.log('response', response.data)
         this.setState({
           list: response.data
         })
+        this.props.updateSaleItems(response.data)
       }
       else{
         console.log('error', response.data)
@@ -44,6 +46,7 @@ class Sales extends Component {
     return (
         <Container style={styles.container}>
           <TopSearchBar gotoProfile={this.gotoProfile}/>
+          <CardComponent/>
         </Container>
     );
   }
@@ -55,7 +58,18 @@ const mapStateToProps = (state) => {
   }
 }
 
-export default connect(mapStateToProps)(Sales);
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateSaleItems: (saleList) => dispatch({
+      type: 'SALE_LIST',
+      payload: {
+        saleList
+      }
+    })
+  }
+}
+
+export default connect(mapStateToProps, mapDispatchToProps)(Sales);
 
 const styles = StyleSheet.create({
     container: {
