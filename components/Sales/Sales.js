@@ -1,12 +1,13 @@
 import React, { Component } from 'react';
-import { Container, Content, Icon, Picker, Form, Header,
-    Item, Input, Button, Text, Thumbnail, Left } from "native-base";
-import { StyleSheet, TouchableOpacity } from 'react-native';
+import { Container, Card, CardItem, Body, Icon, 
+    Item, Input, Button, Text, Thumbnail, Left, Right } from "native-base";
+import { StyleSheet, TouchableOpacity, ScrollView, FlatList, View, Image,
+      TouchableWithoutFeedback, RefreshControl } from 'react-native';
 import TopSearchBar from '../Home/TopSearchBar';
 import axios from 'axios';
 import { connect } from 'react-redux';
+import { awsPrefix } from './../../s3';
 
-import CardComponent from './CardComponent';
 
 class Sales extends Component {
   constructor(props) {
@@ -19,6 +20,10 @@ class Sales extends Component {
 
   gotoProfile(){
     this.props.navigation.navigate('ProfileScreen');
+  }
+
+  gotoItem(){
+    this.props.navigation.navigate('ItemScreen');
   }
 
   componentDidMount(){
@@ -42,11 +47,56 @@ class Sales extends Component {
     .catch( err => console.log(err));
   }
 
+  renderList = ({item}) => {
+    if (!item) {
+      return null;
+    }
+    const { postDate, title, description, category, image } = item;
+    const dateString = new Date(postDate).toString().substring(0, 10)
+    return (
+      <TouchableWithoutFeedback onPress={() => this.gotoItem()}>
+      <Card>
+        <CardItem>
+          <Left>
+          <CardItem cardBody>
+            <Thumbnail square style={{height:100, width:null, flex:1}}
+            source= {{uri: awsPrefix+image}}/>
+          </CardItem>
+          </Left>
+          <Right>
+          <CardItem>
+          <Body>
+            <Button inactive small light><Text>{category}</Text></Button>
+            <Text style={{fontWeight:"900"}}> {title}</Text>
+              <Text>{description} </Text>
+          </Body>
+        </CardItem>
+          </Right>
+        </CardItem>
+        <Body>
+            <Text>
+             {item.userid.name} posted sale on {dateString}
+             </Text>
+        </Body>
+       
+      </Card>
+      </TouchableWithoutFeedback>
+      );
+  }
+
   render() {    
     return (
         <Container style={styles.container}>
           <TopSearchBar gotoProfile={this.gotoProfile}/>
-          <CardComponent/>
+          <ScrollView>
+              <FlatList
+                data={this.state.list.slice(0, 10)}
+                renderItem={this.renderList}
+                horizontal={false}
+                keyExtractor={item => item._id}
+                extraData={this.state}
+              />
+            </ScrollView>
         </Container>
     );
   }

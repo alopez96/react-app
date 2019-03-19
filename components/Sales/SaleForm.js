@@ -17,7 +17,7 @@ class SaleForm extends Component {
         title: '',
         description: '',
         school: '',
-        images: [],
+        imageurl: '',
         sold: false,
         uri: 'https://facebook.github.io/react/logo-og.png'
     };
@@ -90,11 +90,12 @@ verifyInput = () => {
 }
 
 createEventAction = () => {
-    const { category, title, description } = this.state;
+    const { category, title, description, imageurl } = this.state;
     axios.post('http://localhost:3000/newSale', {
         category,
         title,
         description,
+        image: imageurl,
         schoolid: this.props.school,
         userid: this.props.user._id,
         postDate: new Date(),
