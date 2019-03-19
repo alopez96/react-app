@@ -47,6 +47,30 @@ class Sales extends Component {
     .catch( err => console.log(err));
   }
 
+  gotoCategory(category){
+    this.setState({
+      list: []
+    })
+    const { schoolid } = this.props;
+    axios.get(`http://localhost:3000/getSalesCategory/${schoolid}/${category}`, {})
+    .then(response => {
+      if (response.status == 200) {
+        this.setState({
+          list: response.data
+        })
+        this.props.updateSaleItems(response.data)
+      }
+      else{
+        console.log('error', response.data)
+        Toast.show({
+          text: response.data,
+          duration: 3000
+        })
+      }
+    })
+    .catch( err => console.log(err));
+  }
+
   renderList = ({item}) => {
     if (!item) {
       return null;
@@ -66,7 +90,8 @@ class Sales extends Component {
           <Right>
           <CardItem>
           <Body>
-            <Button inactive small light><Text>{category}</Text></Button>
+            <Button transparent small info onPress={() => this.gotoCategory(category)}
+            ><Text>{category}</Text></Button>
             <Text style={{fontWeight:"900"}}> {title}</Text>
               <Text>{description} </Text>
           </Body>
