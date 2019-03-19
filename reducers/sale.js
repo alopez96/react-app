@@ -1,4 +1,4 @@
-const saleListReducer = (state = [], action) => {
+export const saleListReducer = (state = [], action) => {
     switch(action.type){
         case 'SALE_LIST':{
             return [... action.payload.saleList ]
@@ -8,4 +8,24 @@ const saleListReducer = (state = [], action) => {
     }
 }
 
-export default saleListReducer
+export const saleItemReducer = (state = [], action) => {
+    switch(action.type){
+        case 'SALE_ITEM':{
+            return action.payload.saleItem
+        }
+        default: 
+            return state
+    }
+}
+
+
+
+export const saleCategoryReducer = (state = [], action) => {
+    switch(action.type){
+        case 'SALE_CATEGORY':{
+            return action.payload.saleCategory
+        }
+        default:
+            return state
+    }
+}

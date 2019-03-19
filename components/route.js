@@ -11,7 +11,7 @@ import CreateSaleItem from './Sales/CreateSaleItem';
 import Welcome from './Welcome/Welcome';
 import Interest from './Welcome/Interest';
 import Sales from './Sales/Sales';
-import Item from './Sales/Item';
+import ItemComponent from './Sales/ItemComponent';
 import OpenForum from './OpenForum/OpenForum';
 import Profile from './Home/Profile';
 
@@ -47,7 +47,7 @@ export const AppStackNavigator = createStackNavigator({
     SalesScreen: SalesBottomNavigator,
     ForumScreen: OpenForum,
     ProfileScreen: Profile,
-    ItemScreen: Item
+    ItemScreen: ItemComponent
 })
 
 

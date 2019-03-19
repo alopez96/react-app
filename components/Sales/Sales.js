@@ -22,7 +22,8 @@ class Sales extends Component {
     this.props.navigation.navigate('ProfileScreen');
   }
 
-  gotoItem(){
+  gotoItem(item){
+    this.props.updateItem(item)
     this.props.navigation.navigate('ItemScreen');
   }
 
@@ -78,7 +79,7 @@ class Sales extends Component {
     const { postDate, title, description, category, image } = item;
     const dateString = new Date(postDate).toString().substring(0, 10)
     return (
-      <TouchableWithoutFeedback onPress={() => this.gotoItem()}>
+      <TouchableWithoutFeedback onPress={() => this.gotoItem(item)}>
       <Card>
         <CardItem>
           <Left>
@@ -140,7 +141,13 @@ const mapDispatchToProps = (dispatch) => {
       payload: {
         saleList
       }
-    })
+    }),
+    updateItem: (saleItem) => dispatch({
+      type: 'SALE_ITEM',
+      payload: {
+        saleItem
+      }
+    }),
   }
 }
 
