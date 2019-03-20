@@ -18,6 +18,15 @@ export const saleItemReducer = (state = [], action) => {
     }
 }
 
+export const itemIndexReducer = (state = [], action) => {
+    switch(action.type){
+        case 'ITEM_INDEX':{
+            return action.payload.itemIndex
+        }
+        default: 
+            return state
+    }
+}
 
 
 export const saleCategoryReducer = (state = [], action) => {

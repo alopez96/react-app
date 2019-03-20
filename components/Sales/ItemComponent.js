@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
-import { StyleSheet, TouchableOpacity, ScrollView, FlatList, View, Image,
+import { StyleSheet, TouchableOpacity, ScrollView, FlatList, Image,
   TouchableWithoutFeedback, RefreshControl } from 'react-native';
 import { Container, Card, CardItem, Body, Icon, Form, Spinner, H1,
-  Item, Input, Button, Text, Thumbnail, Left, Right, Content } from "native-base";
+  Item, Input, Button, Thumbnail, Left, Right, Content, Text, View } from "native-base";
   import { connect } from 'react-redux';
   import Modal from 'react-native-modal';
 import { RNS3 } from 'react-native-aws3';
@@ -26,9 +26,11 @@ class ItemComponent extends Component {
       isModalVisible: false,
       imageUpdating: false,
       verified: false,
-      sold: false
+      sold: false,
+      showDeleteButton: false
     };
     this.markSold = this.markSold.bind(this);
+    this.deleteItem = this.deleteItem.bind(this);
   }
 
   toogleModal = () => {
@@ -37,12 +39,18 @@ class ItemComponent extends Component {
     })
   }
 
-askPermissionsAsync = async () => {
+  showButton = () => {
+    this.setState({
+        showDeleteButton: true
+    })
+  }
+
+  askPermissionsAsync = async () => {
     // await Permissions.askAsync(Permissions.CAMERA);
     Permissions.askAsync(Permissions.CAMERA_ROLL);
   };
 
-onChangePicture = async () => {
+  onChangePicture = async () => {
     await this.askPermissionsAsync();
     try {
       this.setState({
@@ -131,6 +139,33 @@ onChangePicture = async () => {
                     sold: true,
                     isModalVisible: false
                 })
+            }
+            else{
+                console.log('error updating user')
+            }
+            })
+        .catch( err => console.log(err));
+    }
+  }
+
+  deleteItem(){
+    const { _id } = this.props.item;
+    const userid = this.props.item.userid._id;
+    if(this.props.user._id != this.props.item.userid._id){
+        console.log('user does not have permission to delete')
+    }
+    else{
+        axios.put(`http://localhost:3000/sales/${_id}/removeSale`, {
+          userid
+        })
+        .then(item => {
+            if(item){
+                this.setState({ 
+                    isModalVisible: false
+                })
+                this.props.saleList.splice(this.props.itemIndex,1)
+                this.props.updateSaleItems(this.props.saleList)
+                this.props.navigation.navigate('SalesScreen')
             }
             else{
                 console.log('error updating user')
@@ -247,6 +282,16 @@ onChangePicture = async () => {
                   <Text>Mark item as sold</Text>
                 </Button>
                 :null}
+                {this.state.verified
+                ?<Button transparent danger onPress={() => this.showButton()}>
+                  <Text>Delete this item</Text>
+                </Button>
+                :null}
+                {this.state.showDeleteButton
+                ?<Button danger onPress={this.deleteItem}>
+                  <Text>Delete!</Text>
+                </Button>
+                :null}
             </View>
             </Modal>
         </View>
@@ -255,14 +300,28 @@ onChangePicture = async () => {
   }
 }
 
+
+const mapDispatchToProps = (dispatch) => {
+  return {
+    updateSaleItems: (saleList) => dispatch({
+      type: 'SALE_LIST',
+      payload: {
+        saleList
+      }
+    })
+  }
+}
+
 const mapStateToProps = (state) => {
     return {
         item: state.saleItem,
-        user: state.user
+        user: state.user,
+        saleList: state.saleList,
+        itemIndex: state.itemIndex
     }
 }
 
-export default connect(mapStateToProps)(ItemComponent);
+export default connect(mapStateToProps, mapDispatchToProps)(ItemComponent);
 
 const styles = StyleSheet.create({
   modalStyle:{

@@ -24,8 +24,9 @@ class Sales extends Component {
     this.props.navigation.navigate('ProfileScreen');
   }
 
-  gotoItem(item){
+  gotoItem(item, index){
     this.props.updateItem(item)
+    this.props.updateItemIndex(index)
     this.props.navigation.navigate('ItemScreen');
   }
 
@@ -81,14 +82,14 @@ class Sales extends Component {
     .catch( err => console.log(err));
   }
 
-  renderList = ({item}) => {
+  renderList = ({item, index}) => {
     if (!item) {
       return null;
     }
     const { postDate, title, description, category, image } = item;
     const dateString = new Date(postDate).toString().substring(0, 10)
     return (
-      <TouchableWithoutFeedback onPress={() => this.gotoItem(item)}>
+      <TouchableWithoutFeedback onPress={() => this.gotoItem(item, index)}>
       <Card>
         <CardItem>
           <Left>
@@ -158,6 +159,12 @@ const mapDispatchToProps = (dispatch) => {
       type: 'SALE_ITEM',
       payload: {
         saleItem
+      }
+    }),
+    updateItemIndex: (itemIndex) => dispatch({
+      type: 'ITEM_INDEX',
+      payload: {
+        itemIndex
       }
     }),
   }
