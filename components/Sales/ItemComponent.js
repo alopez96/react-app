@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList, View, Image,
   TouchableWithoutFeedback, RefreshControl } from 'react-native';
-import { Container, Card, CardItem, Body, Icon, Form, Spinner,
+import { Container, Card, CardItem, Body, Icon, Form, Spinner, H1,
   Item, Input, Button, Text, Thumbnail, Left, Right, Content } from "native-base";
   import { connect } from 'react-redux';
   import Modal from 'react-native-modal';
@@ -25,8 +25,10 @@ class ItemComponent extends Component {
       lastEditDate: '',
       isModalVisible: false,
       imageUpdating: false,
-      verified: false
+      verified: false,
+      sold: false
     };
+    this.markSold = this.markSold.bind(this);
   }
 
   toogleModal = () => {
@@ -113,12 +115,37 @@ onChangePicture = async () => {
     }
   }
 
+  markSold(){
+    const { _id } = this.props.item;
+    const userid = this.props.item.userid._id;
+    if(this.props.user._id != this.props.item.userid._id){
+        console.log('user does not have permission to edit')
+    }
+    else{
+        axios.put(`http://localhost:3000/sales/${_id}/markSold`, {
+          userid
+        })
+        .then(item => {
+            if(item){
+                this.setState({
+                    sold: true,
+                    isModalVisible: false
+                })
+            }
+            else{
+                console.log('error updating user')
+            }
+            })
+        .catch( err => console.log(err));
+    }
+  }
+
 
   componentDidMount(){
-    const { title, description, category, image, postDate, lastEditDate } = this.props.item;
+    const { title, description, category, image, postDate, lastEditDate, sold } = this.props.item;
     this.setState({
         title, description, category, 
-        image, postDate, lastEditDate
+        image, postDate, lastEditDate, sold
     })
     //check userid for access to edit
     if(this.props.user._id == this.props.item.userid._id){
@@ -164,12 +191,13 @@ onChangePicture = async () => {
         </Body>
         </CardItem>
       </Card>
-      {this.state.verified
+      {this.state.sold
+      ?<H1 style={{margin:20, color: 'red'}}>Item has been sold!</H1>
+      :(this.state.verified
       ?<Button transparent onPress={this.toogleModal}>
         <Text>Edit</Text>
       </Button>
-      :null}
-
+      :null)}
 
       <View>
       <Modal isVisible={this.state.isModalVisible}
@@ -211,8 +239,13 @@ onChangePicture = async () => {
                 ?<Button transparent info onPress={this.onChangePicture}>
                   <Text>Change Picture</Text>
                 </Button>
-                :<Spinner color='blue' />
+                :<Spinner color='blue'/>
                 )
+                :null}
+                {this.state.verified
+                ?<Button transparent success onPress={this.markSold}>
+                  <Text>Mark item as sold</Text>
+                </Button>
                 :null}
             </View>
             </Modal>
