@@ -13,9 +13,11 @@ class Sales extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      list: []
+      list: [],
+      loading: false,
      };
     this.gotoProfile = this.gotoProfile.bind(this);
+    this.getSales = this.getSales.bind(this);
   }
 
   gotoProfile(){
@@ -28,12 +30,18 @@ class Sales extends Component {
   }
 
   componentDidMount(){
+    this.getSales();
+  }
+
+  getSales(){
     const { schoolid } = this.props;
+    this.setState({ loading: true })
     axios.get(`http://localhost:3000/getSales/${schoolid}`, {})
     .then(response => {
       if (response.status == 200) {
         this.setState({
-          list: response.data
+          list: response.data,
+          loading: false
         })
         this.props.updateSaleItems(response.data)
       }
@@ -50,7 +58,8 @@ class Sales extends Component {
 
   gotoCategory(category){
     this.setState({
-      list: []
+      list: [],
+      loading: true
     })
     const { schoolid } = this.props;
     axios.get(`http://localhost:3000/getSalesCategory/${schoolid}/${category}`, {})
@@ -114,7 +123,10 @@ class Sales extends Component {
     return (
         <Container style={styles.container}>
           <TopSearchBar gotoProfile={this.gotoProfile}/>
-          <ScrollView>
+          <ScrollView refreshControl={<RefreshControl
+          refreshing={this.state.loading}
+          onRefresh={this.getSales}
+          />}>
               <FlatList
                 data={this.state.list.slice(0, 10)}
                 renderItem={this.renderList}

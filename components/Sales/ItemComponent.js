@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList, View, Image,
   TouchableWithoutFeedback, RefreshControl } from 'react-native';
-import { Container, Card, CardItem, Body, Icon, Form,
+import { Container, Card, CardItem, Body, Icon, Form, Spinner,
   Item, Input, Button, Text, Thumbnail, Left, Right, Content } from "native-base";
   import { connect } from 'react-redux';
   import Modal from 'react-native-modal';
@@ -16,16 +16,15 @@ class ItemComponent extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      uid: '',
-      name: '',
-      userimage: '',
       match: false,
-      mytitle: '',
-      mydescription: '',
+      title: '',
+      description: '',
       image: '',
-      mycategory: '',
+      category: '',
+      postDate: '',
+      lastEditDate: '',
       isModalVisible: false,
-      imageUpdated: false,
+      imageUpdating: false,
       verified: false
     };
   }
@@ -44,6 +43,9 @@ askPermissionsAsync = async () => {
 onChangePicture = async () => {
     await this.askPermissionsAsync();
     try {
+      this.setState({
+        imageUpdating: true
+      })
     let result = await ImagePicker.launchImageLibraryAsync({
         allowsEditing: true,
         aspect: [4, 3],
@@ -70,8 +72,9 @@ onChangePicture = async () => {
     .then((response) => {
         this.setState({
           image: response.body.postResponse.key,
-          myimageurl: awsPrefix + response.body.postResponse.key
+          imageurl: awsPrefix + response.body.postResponse.key
         });
+        this.submitChanges();
     }).catch((err) => { console.log(err) });
     } 
     catch (error) { console.log(error) };
@@ -79,26 +82,27 @@ onChangePicture = async () => {
 
 
   submitChanges = () => {
-    const { _id, schoolid } = this.props.item;
-    const { mytitle, mydescription, mycategory } = this.state;
+    const { _id } = this.props.item;
+    const { title, description, category, image } = this.state;
     const userid = this.props.item.userid._id;
     const lastEditDate = new Date();
     if(this.props.user._id != this.props.item.userid._id){
-        console.log('user does not have permission to delete')
+        console.log('user does not have permission to edit')
     }
     else{
         axios.put(`http://localhost:3000/editSale/${_id}`, {
           userid,
-          title: mytitle,
-          description: mydescription,
-          category: mycategory, 
-          schoolid, 
-          lastEditDate
+          title,
+          description,
+          category, 
+          lastEditDate,
+          image
         })
         .then(item => {
             if(item){
                 this.setState({
-                    isModalVisible: !this.state.isModalVisible
+                    isModalVisible: !this.state.isModalVisible,
+                    imageUpdating: false
                 })
             }
             else{
@@ -111,23 +115,19 @@ onChangePicture = async () => {
 
 
   componentDidMount(){
-    const { title, description, category } = this.props.item;
+    const { title, description, category, image, postDate, lastEditDate } = this.props.item;
     this.setState({
-        mytitle: title,
-        mydescription: description,
-        mycategory: category
+        title, description, category, 
+        image, postDate, lastEditDate
     })
     //check userid for access to edit
-    console.log(this.props.user._id)
-    console.log(this.props.item.userid._id)
     if(this.props.user._id == this.props.item.userid._id){
       this.setState({ verified: true })
     }
   }
 
   render() {
-    const { image, title, description, postDate, category } = this.props.item;
-    const {mytitle, mydescription, mycategory } = this.state;
+    const { image, title, description, postDate, category, lastEditDate } = this.state;
     const dateString = new Date(postDate).toString().substring(0, 10)
     return (
       <View>
@@ -142,19 +142,27 @@ onChangePicture = async () => {
           <Right>
           <CardItem>
           <Body>
-            <Button transparent small info>
-            <Text>{category}</Text></Button>
+            <Button bordered small info>
+              <Text>{category}</Text>
+            </Button>
             <Text style={{fontWeight:"900"}}>{title}</Text>
               <Text>{description} </Text>
           </Body>
         </CardItem>
           </Right>
         </CardItem>
+        <CardItem>
         <Body>
             <Text>
-             {this.props.item.userid.name} posted sale on {dateString}
+             {this.props.item.userid.name} first posted sale on {dateString}
              </Text>
+             {lastEditDate && lastEditDate.length > 0 
+              ?<Text>
+              It was last edited {dateString}
+              </Text>
+              :null}
         </Body>
+        </CardItem>
       </Card>
       {this.state.verified
       ?<Button transparent onPress={this.toogleModal}>
@@ -171,33 +179,41 @@ onChangePicture = async () => {
                 <Item>
                     <Input placeholder="title"
                     label='title'
-                    onChangeText={(mytitle) => this.setState({ mytitle })}
-                    value={mytitle}
+                    onChangeText={(title) => this.setState({ title })}
+                    value={title}
                         />
                 </Item>
                 <Item>
                     <Input placeholder="description"
                     label='description'
-                    onChangeText={(mydescription) => this.setState({ mydescription })}
-                    value={mydescription}
+                    onChangeText={(description) => this.setState({ description })}
+                    value={description}
                         />
                 </Item>
                 <Item>
                     <Input placeholder="category"
                     label='category'
-                    onChangeText={(mycategory) => this.setState({ mycategory })}
-                    value={mycategory}
+                    onChangeText={(category) => this.setState({ category })}
+                    value={category}
                         />
                 </Item>
                 </Form>   
                 <View style={styles.modalButtons}>
-                <Button transparent onPress={()=> this.toogleModal()}>
+                <Button transparent info onPress={()=> this.toogleModal()}>
                   <Text>Cancel</Text>
                 </Button>
                 <Button transparent onPress={() => this.submitChanges() }>
                   <Text>Submit</Text>
                 </Button>
                 </View>
+                {this.state.verified
+                ?(this.state.imageUpdating == false
+                ?<Button transparent info onPress={this.onChangePicture}>
+                  <Text>Change Picture</Text>
+                </Button>
+                :<Spinner color='blue' />
+                )
+                :null}
             </View>
             </Modal>
         </View>
