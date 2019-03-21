@@ -41,6 +41,7 @@ class Sales extends Component {
   }
 
   getSales(){
+    console.log('get sales')
     const { schoolid } = this.props;
     this.setState({ loading: true })
     axios.get(`http://localhost:3000/getSales/${schoolid}`, {})
@@ -140,12 +141,11 @@ class Sales extends Component {
           <ScrollView refreshControl={<RefreshControl
           refreshing={this.state.loading}
           onRefresh={this.getSales}
+          />}
           onContentSizeChange={(w, h) => { this.contentHeight = h }}
           onLayout={(ev) => { this.scrollViewHeight = ev.nativeEvent.layout.height }}
           onScroll={this.onScrollMoveFooter}
-          scrollEventThrottle={16}
-          style={styles.scrollView}
-          />}>
+          scrollEventThrottle={16}>
               <FlatList
                 data={this.state.list.slice(0, 10)}
                 renderItem={this.renderList}
@@ -231,13 +231,6 @@ const styles = StyleSheet.create({
     categoryButton: {
       fontSize: 14,
       alignSelf: 'center'
-    },
-    
-    scrollView: {
-      padding: 20,
-    },
-    text: {
-      marginBottom: 60,
     },
     fixedHeader: {
       position: 'absolute',

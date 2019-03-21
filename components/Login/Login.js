@@ -45,7 +45,10 @@ signInUser = () => {
     .then(response => {
     if (response.status == 200) {
         this.props.updateUser(response.data.user)
-        this.props.navigation.navigate('AppScreen');
+        //updating school and interest for testing!
+        this.props.updateSchool('5c89beb5d5059e88aede5018')
+        this.props.updateInterest('sales')
+        this.props.navigation.navigate('SalesScreen');
     }
     else{
       console.log('login error', response.data)
@@ -108,6 +111,18 @@ const mapDispatchToProps = (dispatch) => {
       type: 'LOAD_USER',
       payload: {
         user
+      }
+    }),
+    updateSchool: (school) => dispatch({
+      type: 'UPDATE_SCHOOL',
+      payload: {
+        school
+      }
+    }),
+    updateInterest: (interest) => dispatch({
+      type: 'INTEREST_TYPE',
+      payload: {
+        interest
       }
     })
   }
