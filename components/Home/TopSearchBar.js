@@ -13,13 +13,18 @@ class TopSearchBar extends Component {
         titleSearch: '',
         uri: ''
     };
+    //bind to use this and props inside
     this.search = this.search.bind(this);
   }
 
   search(){
         const { titleSearch } = this.state;
         console.log('search', titleSearch);
-    }
+  }
+
+  gotoMenu(){
+    this.props.gotoMenu();  
+}
    
 
   render() {
@@ -35,8 +40,11 @@ class TopSearchBar extends Component {
             onChangeText={(titleSearch) => this.setState({ titleSearch })}
             value={this.state.titleSearch}/>
         </Item>
-        <Button transparent onPress={() => this.search()}>
+        <Button transparent onPress={() => this.search()} style={{margin:-10}}>
             <Icon name="ios-search" />
+          </Button>
+          <Button transparent onPress={() => this.gotoMenu()} style={{margin:-5}}>
+            <Icon name="ios-arrow-dropdown" />
           </Button>
       </Header>
     );

@@ -20,10 +20,15 @@ class Sales extends Component {
       loading: false,
       scrollY: new Animated.Value(0),
      };
+     this.gotoMenu = this.gotoMenu.bind(this);
     this.gotoProfile = this.gotoProfile.bind(this);
     this.getSales = this.getSales.bind(this);
     this.gotoCategory = this.gotoCategory.bind(this);
     this.onScrollMoveFooter = this.onScrollMoveFooter.bind(this)
+  }
+
+  gotoMenu(){
+    this.props.navigation.navigate('MenuScreen');
   }
 
   gotoProfile(){
@@ -41,7 +46,6 @@ class Sales extends Component {
   }
 
   getSales(){
-    console.log('get sales')
     const { schoolid } = this.props;
     this.setState({ loading: true })
     axios.get(`http://localhost:3000/getSales/${schoolid}`, {})
@@ -134,11 +138,12 @@ class Sales extends Component {
     }
   }
 
-  render() {    
+  render() {  
     return (
         <Container style={styles.container}>
           <Content>
-          <ScrollView refreshControl={<RefreshControl
+          <ScrollView style={{marginTop:50, marginBottom:20}}
+          refreshControl={<RefreshControl
           refreshing={this.state.loading}
           onRefresh={this.getSales}
           />}
@@ -147,7 +152,7 @@ class Sales extends Component {
           onScroll={this.onScrollMoveFooter}
           scrollEventThrottle={16}>
               <FlatList
-                data={this.state.list.slice(0, 10)}
+                data={this.props.saleList.slice(0, 10)}
                 renderItem={this.renderList}
                 horizontal={false}
                 numColumns={2}
@@ -155,13 +160,14 @@ class Sales extends Component {
                 extraData={this.state}
               />
             </ScrollView>
-             <Animated.View
+            <Animated.View
             style={[
             styles.fixedHeader,
             { transform: [{ translateY: this.state.scrollY }] },
             ]}
             >
-            <TopSearchBar gotoProfile={this.gotoProfile}/>
+            <TopSearchBar gotoMenu={this.gotoMenu}
+            gotoProfile={this.gotoProfile}/>
             </Animated.View>
             </Content>
         </Container>
@@ -171,7 +177,9 @@ class Sales extends Component {
 
 const mapStateToProps = (state) => {
   return {
-      schoolid: state.school
+      schoolid: state.school,
+      saleCategory: state.saleCategory,
+      saleList: state.saleList
   }
 }
 
