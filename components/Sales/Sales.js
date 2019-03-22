@@ -1,9 +1,9 @@
 import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList, View, Image,
   TouchableWithoutFeedback, RefreshControl, Dimensions, Animated } from 'react-native';
-import { Container, Card, CardItem, Body, Icon, Content,
-    Item, Input, Button, Text, Thumbnail, Left, Right } from "native-base";
+import { Container, Content, Button, Text } from "native-base";
 import TopSearchBar from '../Home/TopSearchBar';
+import Menu from '../Sales/Menu';
 import axios from 'axios';
 import { connect } from 'react-redux';
 import { awsPrefix } from './../../s3';
@@ -19,16 +19,18 @@ class Sales extends Component {
       list: [],
       loading: false,
       scrollY: new Animated.Value(0),
+      showModal: false
      };
      this.gotoMenu = this.gotoMenu.bind(this);
     this.gotoProfile = this.gotoProfile.bind(this);
     this.getSales = this.getSales.bind(this);
     this.gotoCategory = this.gotoCategory.bind(this);
-    this.onScrollMoveFooter = this.onScrollMoveFooter.bind(this)
+    this.onScrollMoveFooter = this.onScrollMoveFooter.bind(this);
   }
 
   gotoMenu(){
-    this.props.navigation.navigate('MenuScreen');
+    this.props.toggleModal(true);
+    this.setState({ showModal:true })
   }
 
   gotoProfile(){
@@ -37,7 +39,6 @@ class Sales extends Component {
 
   gotoItem(item, index){
     this.props.updateItem(item)
-    this.props.updateItemIndex(index)
     this.props.navigation.navigate('ItemScreen');
   }
 
@@ -170,6 +171,9 @@ class Sales extends Component {
             gotoProfile={this.gotoProfile}/>
             </Animated.View>
             </Content>
+            {this.state.showModal
+            ?<Menu getSales={this.getSales}/>
+            :null}
         </Container>
     );
   }
@@ -197,10 +201,10 @@ const mapDispatchToProps = (dispatch) => {
         saleItem
       }
     }),
-    updateItemIndex: (itemIndex) => dispatch({
-      type: 'ITEM_INDEX',
+    toggleModal: (isModalVisible) => dispatch({
+      type: 'TOGGLE_MODAL',
       payload: {
-        itemIndex
+        isModalVisible
       }
     }),
   }

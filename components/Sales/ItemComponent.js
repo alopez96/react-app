@@ -163,7 +163,6 @@ class ItemComponent extends Component {
                 this.setState({ 
                     isModalVisible: false
                 })
-                this.props.saleList.splice(this.props.itemIndex,1)
                 this.props.updateSaleItems(this.props.saleList)
                 this.props.navigation.navigate('SalesScreen')
             }
@@ -316,8 +315,7 @@ const mapStateToProps = (state) => {
     return {
         item: state.saleItem,
         user: state.user,
-        saleList: state.saleList,
-        itemIndex: state.itemIndex
+        saleList: state.saleList
     }
 }
 

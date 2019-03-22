@@ -18,21 +18,20 @@ export const saleItemReducer = (state = [], action) => {
     }
 }
 
-export const itemIndexReducer = (state = [], action) => {
-    switch(action.type){
-        case 'ITEM_INDEX':{
-            return action.payload.itemIndex
-        }
-        default: 
-            return state
-    }
-}
-
-
 export const saleCategoryReducer = (state = [], action) => {
     switch(action.type){
         case 'SALE_CATEGORY':{
             return action.payload.saleCategory
+        }
+        default:
+            return state
+    }
+}
+
+export const modalReducer = (state = [], action) => {
+    switch(action.type){
+        case 'TOGGLE_MODAL': {
+            return action.payload.isModalVisible
         }
         default:
             return state
