@@ -47,8 +47,8 @@ signInUser = () => {
         this.props.updateUser(response.data.user)
         //updating school and interest for testing!
         this.props.updateSchool('5c89beb5d5059e88aede5018')
-        this.props.updateInterest('sales')
-        this.props.navigation.navigate('SalesScreen');
+        this.props.updateInterest('forum')
+        this.props.navigation.navigate('ForumScreen');
     }
     else{
       console.log('login error', response.data)
