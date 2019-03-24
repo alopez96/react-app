@@ -14,7 +14,9 @@ class OpenForum extends Component {
     super(props);
     this.state = {
       loading: false,
-      list: []
+      list: [],
+      username: '',
+      userimage: ''
     };
   }
 
@@ -49,18 +51,52 @@ class OpenForum extends Component {
     if (!item) {
       return null;
     }
-    const { postDate, body, imageurl, likeList, user } = item;
+    if(item.post){
+      item = item.post;
+    }
+    const { postDate, body, imageurl, likeList } = item;
+    //if user just added post, name and image wont be in object
+    if(typeof(item.user) == 'string'){
+      //get user info
+      axios.get(`http://localhost:3000/getUser/${item.user}`, {})
+      .then(response => {
+        if (response.status == 200) {
+          //convert user string to object
+          item.user = {
+            name: response.data.name,
+            imageurl: response.data.imageurl
+          }
+          //above not working, saving value in string
+          this.setState({
+            username: response.data.name,
+            userimage: response.data.imageurl
+          })
+        }
+        else{
+          console.log('error', response.data)
+        }
+      })
+      .catch( err => console.log(err));
+    }
+
     const dateString = new Date(postDate).toString().substring(0, 10)
     return (
       <Card>
         <CardItem>
           <Left>
             <TouchableOpacity onPress={() => this.props.userClicked(userid)}>
-            <Thumbnail
-              source= {{uri: awsPrefix+user.imageurl}}/>
+            {item.user.imageurl
+            ?<Thumbnail
+              source= {{uri: awsPrefix+item.user.imageurl}}/>
+            :<Thumbnail
+            source= {{uri: awsPrefix+this.state.userimage}}/>
+            }
             </TouchableOpacity>
             <Body>
-              <Text style={{fontWeight:"700"}}> {user.name} </Text>
+              {item.user.image
+              ?<Text style={{fontWeight:"700"}}> {item.user.name} </Text>
+              :<Text style={{fontWeight:"700"}}> {this.state.username} </Text>
+              }
               <Text note>• {dateString} </Text>
             </Body>
           </Left>

@@ -14,6 +14,7 @@ import Sales from './Sales/Sales';
 import Menu from './Sales/Menu';
 import ItemComponent from './Sales/ItemComponent';
 import OpenForum from './OpenForum/OpenForum';
+import CreatePost from './OpenForum/CreatePost';
 import Profile from './Home/Profile';
 
 
@@ -41,12 +42,35 @@ export const SalesBottomNavigator = createBottomTabNavigator({
     order: ['Sales', 'Add']
 })
 
+export const PostsBottomNavigator = createBottomTabNavigator({
+    Posts:{
+        screen: OpenForum,
+            navigationOptions: {
+                tabBarLabel: () => { },
+                tabBarIcon: ({ tintColor }) => (
+                    <Icon name="ios-home" size={40} color={tintColor} />
+                ),
+            }
+    },
+    Add:{
+        screen: CreatePost,
+            navigationOptions: {
+                tabBarLabel: () => { },
+                tabBarIcon: ({ tintColor }) => (
+                    <Icon name="ios-add" size={40} color={tintColor} />
+                ),
+            }
+    },
+},  {
+    order: ['Posts', 'Add']
+})
+
 export const AppStackNavigator = createStackNavigator({
     WelcomeScreen: Welcome,
     InterestScreen: Interest,
     Main: Home,
     SalesScreen: SalesBottomNavigator,
-    ForumScreen: OpenForum,
+    ForumScreen: PostsBottomNavigator,
     ProfileScreen: Profile,
     ItemScreen: ItemComponent,
     MenuScreen: Menu
