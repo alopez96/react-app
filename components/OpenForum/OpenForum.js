@@ -19,6 +19,12 @@ class OpenForum extends Component {
       userimage: ''
     };
   }
+  
+  //click listener for image press -> gotoPost
+  gotoPost(post){
+    this.props.updatePost(post)
+  this.props.navigation.navigate('PostScreen');
+  }
 
   componentDidMount(){
     this.getPosts();
@@ -47,12 +53,15 @@ class OpenForum extends Component {
     .catch( err => console.log(err));
   }
 
-  renderList = ({item, index}) => {
+  //handle post variables, and render
+  renderList = ({item}) => {
     if (!item) {
       return null;
     }
+    var newPost = false
     if(item.post){
       item = item.post;
+      newPost = true;
     }
     const { postDate, body, imageurl, likeList } = item;
     //if user just added post, name and image wont be in object
@@ -78,22 +87,22 @@ class OpenForum extends Component {
       })
       .catch( err => console.log(err));
     }
-
+    //return the card display
     const dateString = new Date(postDate).toString().substring(0, 10)
     return (
       <Card>
         <CardItem>
           <Left>
-            <TouchableOpacity onPress={() => this.props.userClicked(userid)}>
-            {item.user.imageurl
+            <TouchableWithoutFeedback>
+            {!newPost
             ?<Thumbnail
               source= {{uri: awsPrefix+item.user.imageurl}}/>
             :<Thumbnail
             source= {{uri: awsPrefix+this.state.userimage}}/>
             }
-            </TouchableOpacity>
+            </TouchableWithoutFeedback>
             <Body>
-              {item.user.image
+              {!newPost
               ?<Text style={{fontWeight:"700"}}> {item.user.name} </Text>
               :<Text style={{fontWeight:"700"}}> {this.state.username} </Text>
               }
@@ -103,7 +112,7 @@ class OpenForum extends Component {
         </CardItem>
         {imageurl.length > 10
         ?<CardItem cardBody>
-        <TouchableWithoutFeedback onPress={() => this.gotoItem(item, index)}>
+        <TouchableWithoutFeedback onPress={() => this.gotoPost(item)}>
         <Thumbnail square style={{height:200, width:null, flex:1}}
          source={{ uri: awsPrefix+imageurl }}/>
          </TouchableWithoutFeedback>
@@ -163,7 +172,7 @@ const mapDispatchToProps = (dispatch) => {
         postList
       }
     }),
-    updateItem: (post) => dispatch({
+    updatePost: (post) => dispatch({
       type: 'SELECT_POST',
       payload: {
         post

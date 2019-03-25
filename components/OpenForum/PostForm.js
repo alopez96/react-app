@@ -15,9 +15,17 @@ class PostForm extends Component {
     this.state = {
         body: '',
         imageurl: '',
-        uri: 'https://facebook.github.io/react/logo-og.png'
+        uri: 'https://facebook.github.io/react/logo-og.png',
+        editing: false
     };
     this.createPostAction = this.createPostAction.bind(this);
+  }
+
+  componentDidMount(){
+      //check if component mounted through edit Post
+      if(this.props.edit){
+          this.setState({editing:true})
+      }
   }
 
   askPermissionsAsync = async () => {
@@ -122,10 +130,15 @@ createPostAction = () => {
             </TouchableOpacity>
         </Content>   
         <View style={styles.buttons}>
-        <TouchableOpacity onPress={() => this.props.gotoPosts()}>
+        {!this.state.editing
+        ?<TouchableOpacity onPress={() => this.props.gotoPosts()}>
             <Icon name="ios-close-circle-outline"
             style={styles.button}/>
         </TouchableOpacity>
+        :<TouchableOpacity onPress={() => this.props.toggleModal()}>
+            <Icon name="ios-close-circle-outline"
+            style={styles.button}/>
+         </TouchableOpacity>}
         <TouchableOpacity onPress={() => this.verifyInput() }>
                 <Icon name="ios-checkbox-outline"
                 style={styles.button}/>

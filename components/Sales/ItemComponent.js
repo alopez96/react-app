@@ -11,7 +11,7 @@ import { ImagePicker, Permissions } from 'expo';
 import { myAccessKey, mySecretKey, awsPrefix } from './../../s3';
 import v1 from 'uuid/v1';
 
-
+//ItemComponent displays the item selected, and lets verified user edit
 class ItemComponent extends Component {
   constructor(props) {
     super(props);

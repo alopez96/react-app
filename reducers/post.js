@@ -13,7 +13,7 @@ export const postListReducer = (state = [], action) => {
 export const postReducer = (state = [], action) => {
     switch(action.type){
         case 'SELECT_POST':{
-            return action.payload.saleItem
+            return action.payload.post
         }
         default: 
             return state

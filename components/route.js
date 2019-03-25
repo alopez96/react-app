@@ -15,6 +15,7 @@ import Menu from './Sales/Menu';
 import ItemComponent from './Sales/ItemComponent';
 import OpenForum from './OpenForum/OpenForum';
 import CreatePost from './OpenForum/CreatePost';
+import PostComponent from './OpenForum/PostComponent';
 import Profile from './Home/Profile';
 
 
@@ -73,6 +74,7 @@ export const AppStackNavigator = createStackNavigator({
     ForumScreen: PostsBottomNavigator,
     ProfileScreen: Profile,
     ItemScreen: ItemComponent,
+    PostScreen: PostComponent,
     MenuScreen: Menu
 })
 
