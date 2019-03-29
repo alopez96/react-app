@@ -40,7 +40,7 @@ class OpenForum extends Component {
       //user has not liked, so like
       else{
         //add user to array
-        newList[index].likeList.splice(0, 1, this.props.user._id)
+        newList[index].likeList.splice(0, 0, this.props.user._id)
         //update the postList
         this.props.postList.splice(index, 1, newList[index])
         //trigger dispatch to updateList
@@ -54,7 +54,7 @@ class OpenForum extends Component {
     })
     .then(response => {
       if (response.status == 200) {
-        console.log('liked successful')
+        
       }
       else{
         console.log('error', response.data)
