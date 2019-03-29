@@ -20,10 +20,13 @@ class OpenForum extends Component {
     };
   }
   
-  //click listener for image press -> gotoPost
-  gotoPost(post){
+  //click listener for card -> go to PostComponent
+  gotoPost(post, index){
+    //mapDispatchToProps to select specific post
     this.props.updatePost(post)
-  this.props.navigation.navigate('PostScreen');
+    this.props.postIndex(index)
+    //go to PostComponent
+    this.props.navigation.navigate('PostScreen');
   }
 
   componentDidMount(){
@@ -54,7 +57,7 @@ class OpenForum extends Component {
   }
 
   //handle post variables, and render
-  renderList = ({item}) => {
+  renderList = ({item, index}) => {
     if (!item) {
       return null;
     }
@@ -90,6 +93,7 @@ class OpenForum extends Component {
     //return the card display
     const dateString = new Date(postDate).toString().substring(0, 10)
     return (
+      <TouchableOpacity onPress={() => this.gotoPost(item, index)}>
       <Card>
         <CardItem>
           <Left>
@@ -112,7 +116,7 @@ class OpenForum extends Component {
         </CardItem>
         {imageurl.length > 10
         ?<CardItem cardBody>
-        <TouchableWithoutFeedback onPress={() => this.gotoPost(item)}>
+        <TouchableWithoutFeedback>
         <Thumbnail square style={{height:200, width:null, flex:1}}
          source={{ uri: awsPrefix+imageurl }}/>
          </TouchableWithoutFeedback>
@@ -126,6 +130,7 @@ class OpenForum extends Component {
         <View  style={{ borderBottomColor:'#c0c0c0', borderBottomWidth:1}}>
           </View>
       </Card>
+      </TouchableOpacity>
       );
   }
 
@@ -177,7 +182,13 @@ const mapDispatchToProps = (dispatch) => {
       payload: {
         post
       }
-    })
+    }),
+    postIndex: (index) => dispatch({
+      type: 'POST_INDEX',
+      payload: {
+        index
+      }
+    }),
   }
 }
 

@@ -19,3 +19,15 @@ export const postReducer = (state = [], action) => {
             return state
     }
 }
+
+//reducer to select specific post
+export const indexReducer = (state = [], action) => {
+    switch(action.type){
+        case 'POST_INDEX':{
+            return action.payload.index
+        }
+        default: 
+            return state
+    }
+}
+

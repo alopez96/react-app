@@ -32,6 +32,15 @@ class PostComponent extends Component {
     this.onChangePicture = this.onChangePicture.bind(this);
     this.submitChanges = this.submitChanges.bind(this);
     this.deletePost = this.deletePost.bind(this);
+    this.gotoPosts = this.gotoPosts.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
+  }
+
+  gotoPosts(){
+    this.setState({
+      isModalVisible: false
+  })
+    this.props.navigation.navigate('ForumScreen')
   }
 
   toggleModal = () => {
@@ -205,6 +214,7 @@ class PostComponent extends Component {
       <Modal isVisible={this.state.isModalVisible}
             style={styles.modalStyle}>
             <PostForm edit={true}
+            gotoPosts={this.gotoPosts}
             toggleModal={this.toggleModal}/>
             </Modal>
         </View>

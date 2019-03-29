@@ -4,7 +4,7 @@ import schoolReducer from '../reducers/school';
 import interestReducer from '../reducers/interest';
 import { saleListReducer, saleItemReducer, 
         saleCategoryReducer, modalReducer } from '../reducers/sale';
-import { postListReducer, postReducer } from '../reducers/post';
+import { postListReducer, postReducer, indexReducer } from '../reducers/post';
 
 const allReducers = combineReducers({
     user: userReducer,
@@ -15,7 +15,8 @@ const allReducers = combineReducers({
     saleCategory: saleCategoryReducer,
     isModalVisible: modalReducer,
     postList: postListReducer,
-    post: postReducer
+    post: postReducer,
+    index: indexReducer
 })
 
 export default store = createStore(allReducers)

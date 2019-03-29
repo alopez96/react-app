@@ -19,6 +19,14 @@ class PostForm extends Component {
         editing: false
     };
     this.createPostAction = this.createPostAction.bind(this);
+    this.toggleModal = this.toggleModal.bind(this);
+  }
+
+  //cancel click listener -> set editing to false, and close modal
+  toggleModal(){
+      this.setState({editing: !this.state.editing})
+      //trigger toggleModal in PostComponent
+      this.props.toggleModal()
   }
 
   componentDidMount(){
@@ -89,27 +97,57 @@ verifyInput = () => {
 }
 
 createPostAction = () => {
-    const { body, imageurl } = this.state;
-    axios.post('http://localhost:3000/newPost', {
-        body, imageurl,
-        school: this.props.school,
-        user: this.props.user._id,
-        postDate: new Date()
-    })
-    .then(response => {
-    if (response.status == 200) {
-        this.setState({
-            body: ''
+    //check if user is editing
+    if(!this.state.editing){
+        //user is creating new post
+        const { body, imageurl } = this.state;
+        axios.post('http://localhost:3000/newPost', {
+            body, imageurl,
+            school: this.props.school,
+            user: this.props.user._id,
+            postDate: new Date()
         })
-        this.props.postList.push(response.data)
-        this.props.updatePostList(this.props.postList)
-        this.props.gotoPosts();
+        .then(response => {
+        if (response.status == 200) {
+            this.setState({
+                body: ''
+            })
+            this.props.postList.push(response.data)
+            this.props.updatePostList(this.props.postList)
+            this.props.gotoPosts();
+        }
+        else{
+            console.log('error', response)
+        }
+        })
+        .catch( err => console.log(err));
     }
+    //user is editing
     else{
-        console.log('error', response)
+        const { body, imageurl } = this.state;
+        const { _id } = this.props.post;
+        axios.put(`http://localhost:3000/editPost/${_id}`, {
+            user: this.props.post.user._id,
+            body: body,
+            imageurl: imageurl,
+            editDate: new Date()
+        })
+        .then(response => {
+        if (response.status == 200) {
+            this.setState({
+                body: ''
+            })
+            const { index } = this.props; 
+            this.props.postList.splice(index, 1, response.data)
+            this.props.updatePostList(this.props.postList)
+            this.props.gotoPosts();
+        }
+        else{
+            console.log('error', response.status)
+        }
+        })
+        .catch( err => console.log(err));
     }
-    })
-    .catch( err => console.log(err));
 }
 
   render() {
@@ -130,12 +168,14 @@ createPostAction = () => {
             </TouchableOpacity>
         </Content>   
         <View style={styles.buttons}>
+        {/* display if user is creating new Post */}
         {!this.state.editing
         ?<TouchableOpacity onPress={() => this.props.gotoPosts()}>
             <Icon name="ios-close-circle-outline"
             style={styles.button}/>
         </TouchableOpacity>
-        :<TouchableOpacity onPress={() => this.props.toggleModal()}>
+        /* display if user is editing Post */
+        :<TouchableOpacity onPress={() => this.toggleModal()}>
             <Icon name="ios-close-circle-outline"
             style={styles.button}/>
          </TouchableOpacity>}
@@ -154,7 +194,9 @@ const mapStateToProps = (state) => {
     return {
         user: state.user,
         school: state.school,
-        postList: state.postList
+        postList: state.postList,
+        post: state.post,
+        index: state.index
     }
 }
 
