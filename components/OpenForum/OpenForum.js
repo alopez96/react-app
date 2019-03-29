@@ -19,7 +19,35 @@ class OpenForum extends Component {
     this.handleLike = this.handleLike.bind(this);
   }
 
-  handleLike(post, user){
+  handleLike(post, user, index){
+    //get postList from store
+    var newList = this.props.postList
+
+    if(newList[index].likeList){
+      //check if the user has already liked
+      var hasLiked = newList[index].likeList.includes(this.props.user._id)
+      //user has already liked, so unlike
+      if(hasLiked){
+        //remove user from likeList array
+        newList[index].likeList
+          .splice(newList[index].likeList
+          .findIndex(e => e == this.props.user._id),1)
+        //update the postList
+        this.props.postList.splice(index, 1, newList[index])
+        //trigger dispatch to updateList
+        this.props.updatePostList(this.props.postList)
+      }
+      //user has not liked, so like
+      else{
+        //add user to array
+        newList[index].likeList.splice(0, 1, this.props.user._id)
+        //update the postList
+        this.props.postList.splice(index, 1, newList[index])
+        //trigger dispatch to updateList
+        this.props.updatePostList(this.props.postList)
+      }
+    }
+
     //update the likeList on db
     axios.put(`http://localhost:3000/likePost/${post._id}`, {
       user: user._id
@@ -76,6 +104,7 @@ class OpenForum extends Component {
     if (!item) {
       return null;
     }
+    
     var newPost = false
     if(item.post){
       item = item.post;
@@ -84,10 +113,16 @@ class OpenForum extends Component {
 
     const { postDate, body, imageurl, likeList } = item;
     
+    //declare varaibles
+    var hasLiked
+    var likeCount
+
     //check if the user has already liked
-    var hasLiked = likeList.includes(this.props.user._id)
-    //get count of likes
-    var likeCount = likeList.length
+    if(likeList){
+      hasLiked = likeList.includes(this.props.user._id)
+      //get count of likes
+      likeCount = likeList.length
+    }
   
     //return the card display
     const dateString = new Date(postDate).toString().substring(0, 10)
@@ -129,9 +164,9 @@ class OpenForum extends Component {
         </CardItem>
         <CardItem>
         {hasLiked
-        ?<Icon onPress={() => this.handleLike(item, item.user)}
+        ?<Icon onPress={() => this.handleLike(item, item.user, index)}
         name="ios-heart" style={{marginLeft: 50, color:'red', marginBottom: 5,}}/>
-        :<Icon onPress={() => this.handleLike(item, item.user)}
+        :<Icon onPress={() => this.handleLike(item, item.user, index)}
         name="ios-heart" style={{marginLeft: 50, marginBottom: 5,}}/>
         }
         {likeCount

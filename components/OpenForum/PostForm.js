@@ -113,7 +113,7 @@ createPostAction = () => {
                 body: ''
             })
             //add new post to front of list            
-            this.props.postList.splice(0, 1, response.data)
+            this.props.postList.splice(0, 0, response.data)
             //trigger dispatch
             this.props.updatePostList(this.props.postList)
             //gotoPosts from CreatePost.js: goto -> OpenFourm.js
