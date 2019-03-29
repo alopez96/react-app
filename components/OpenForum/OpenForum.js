@@ -1,7 +1,8 @@
 import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList, View, Image,
   TouchableWithoutFeedback, RefreshControl, Dimensions, Animated } from 'react-native';
-import { Container, Content, Button, Text, Card, CardItem, Thumbnail, Body, Left } from "native-base";
+import { Container, Content, Button, Text, Card, CardItem, Thumbnail,
+  Icon, Body, Left } from "native-base";
 import axios from 'axios';
 import { connect } from 'react-redux';
 import { awsPrefix } from './../../s3';
@@ -18,6 +19,22 @@ class OpenForum extends Component {
       username: '',
       userimage: ''
     };
+    this.handleLike = this.handleLike.bind(this);
+  }
+
+  handleLike(post, user){
+    axios.put(`http://localhost:3000/likePost/${post._id}`, {
+      user: user._id
+    })
+    .then(response => {
+      if (response.status == 200) {
+        console.log('liked successful')
+      }
+      else{
+        console.log('error', response.data)
+      }
+    })
+    .catch( err => console.log(err));
   }
   
   //click listener for card -> go to PostComponent
@@ -75,6 +92,7 @@ class OpenForum extends Component {
         if (response.status == 200) {
           //convert user string to object
           item.user = {
+            _id: response.data._id,
             name: response.data.name,
             imageurl: response.data.imageurl
           }
@@ -123,9 +141,14 @@ class OpenForum extends Component {
         </CardItem>
         :null}
         <CardItem>
-          <Body style={{height:100, width:null, flex:1}}>
+          <Body style={{height:100, width:null, flex:1, 
+          justifyContent: 'center', alignItems: 'center'}}>
             <Text style={styles.eventTitle}>{body}</Text>
           </Body>
+        </CardItem>
+        <CardItem>
+        <Icon onPress={() => this.handleLike(item, item.user)}
+        name="ios-heart" style={{marginLeft: 50, marginBottom: 5,}}/> 
         </CardItem>
         <View  style={{ borderBottomColor:'#c0c0c0', borderBottomWidth:1}}>
           </View>
@@ -217,10 +240,8 @@ const styles = StyleSheet.create({
     },
     eventTitle: {
       color: 'black',
-      fontWeight: 'bold',
       fontSize: 20,
-      textAlign: 'center',
-      textAlignVertical: 'center'
+      textAlign: 'center'
     },
     categoryButton: {
       fontSize: 14,
