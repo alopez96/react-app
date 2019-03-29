@@ -14,15 +14,13 @@ class OpenForum extends Component {
   constructor(props) {
     super(props);
     this.state = {
-      loading: false,
-      list: [],
-      username: '',
-      userimage: ''
+      loading: false
     };
     this.handleLike = this.handleLike.bind(this);
   }
 
   handleLike(post, user){
+    //update the likeList on db
     axios.put(`http://localhost:3000/likePost/${post._id}`, {
       user: user._id
     })
@@ -53,11 +51,11 @@ class OpenForum extends Component {
   getPosts(){
     const { schoolid } = this.props;
     this.setState({ loading: true })
+    //get the list of posts from db
     axios.get(`http://localhost:3000/getPosts/${schoolid}`, {})
     .then(response => {
       if (response.status == 200) {
         this.setState({
-          list: response.data,
           loading: false
         })
         this.props.updatePostList(response.data)
@@ -73,7 +71,7 @@ class OpenForum extends Component {
     .catch( err => console.log(err));
   }
 
-  //handle post variables, and render
+  //handle variables, and render method of each card
   renderList = ({item, index}) => {
     if (!item) {
       return null;
@@ -83,31 +81,14 @@ class OpenForum extends Component {
       item = item.post;
       newPost = true;
     }
+
     const { postDate, body, imageurl, likeList } = item;
-    //if user just added post, name and image wont be in object
-    if(typeof(item.user) == 'string'){
-      //get user info
-      axios.get(`http://localhost:3000/getUser/${item.user}`, {})
-      .then(response => {
-        if (response.status == 200) {
-          //convert user string to object
-          item.user = {
-            _id: response.data._id,
-            name: response.data.name,
-            imageurl: response.data.imageurl
-          }
-          //above not working, saving value in string
-          this.setState({
-            username: response.data.name,
-            userimage: response.data.imageurl
-          })
-        }
-        else{
-          console.log('error', response.data)
-        }
-      })
-      .catch( err => console.log(err));
-    }
+    
+    //check if the user has already liked
+    var hasLiked = likeList.includes(this.props.user._id)
+    //get count of likes
+    var likeCount = likeList.length
+  
     //return the card display
     const dateString = new Date(postDate).toString().substring(0, 10)
     return (
@@ -116,17 +97,17 @@ class OpenForum extends Component {
         <CardItem>
           <Left>
             <TouchableWithoutFeedback>
-            {!newPost
+            {newPost
             ?<Thumbnail
-              source= {{uri: awsPrefix+item.user.imageurl}}/>
+              source= {{uri: awsPrefix+this.props.user.imageurl}}/>
             :<Thumbnail
-            source= {{uri: awsPrefix+this.state.userimage}}/>
+            source= {{uri: awsPrefix+item.user.imageurl}}/>
             }
             </TouchableWithoutFeedback>
             <Body>
-              {!newPost
-              ?<Text style={{fontWeight:"700"}}> {item.user.name} </Text>
-              :<Text style={{fontWeight:"700"}}> {this.state.username} </Text>
+              {newPost
+              ?<Text style={{fontWeight:"700"}}> {this.props.user.name} </Text>
+              :<Text style={{fontWeight:"700"}}> {item.user.name} </Text>
               }
               <Text note>• {dateString} </Text>
             </Body>
@@ -147,8 +128,16 @@ class OpenForum extends Component {
           </Body>
         </CardItem>
         <CardItem>
-        <Icon onPress={() => this.handleLike(item, item.user)}
-        name="ios-heart" style={{marginLeft: 50, marginBottom: 5,}}/> 
+        {hasLiked
+        ?<Icon onPress={() => this.handleLike(item, item.user)}
+        name="ios-heart" style={{marginLeft: 50, color:'red', marginBottom: 5,}}/>
+        :<Icon onPress={() => this.handleLike(item, item.user)}
+        name="ios-heart" style={{marginLeft: 50, marginBottom: 5,}}/>
+        }
+        {likeCount
+        ?<Text style={{marginBottom: 6}} >{likeCount}</Text>
+        :null
+        } 
         </CardItem>
         <View  style={{ borderBottomColor:'#c0c0c0', borderBottomWidth:1}}>
           </View>
@@ -187,25 +176,32 @@ class OpenForum extends Component {
 
 const mapStateToProps = (state) => {
   return {
+      //get list of posts from store
       postList: state.postList,
-      schoolid: state.school
+      //get the id of the school from store
+      schoolid: state.school,
+      //get the user object from store
+      user: state.user
   }
 }
 
 const mapDispatchToProps = (dispatch) => {
   return {
+    //used to update list of posts, pass array of posts
     updatePostList: (postList) => dispatch({
       type: 'POST_LIST',
       payload: {
         postList
       }
     }),
+    //used to select post, pass single post object
     updatePost: (post) => dispatch({
       type: 'SELECT_POST',
       payload: {
         post
       }
     }),
+    //used to update the index value of the post selected, pass single num value
     postIndex: (index) => dispatch({
       type: 'POST_INDEX',
       payload: {

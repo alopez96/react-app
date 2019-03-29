@@ -112,8 +112,11 @@ createPostAction = () => {
             this.setState({
                 body: ''
             })
-            this.props.postList.push(response.data)
+            //add new post to front of list            
+            this.props.postList.splice(0, 1, response.data)
+            //trigger dispatch
             this.props.updatePostList(this.props.postList)
+            //gotoPosts from CreatePost.js: goto -> OpenFourm.js
             this.props.gotoPosts();
         }
         else{
@@ -126,6 +129,7 @@ createPostAction = () => {
     else{
         const { body, imageurl } = this.state;
         const { _id } = this.props.post;
+        //use editPost API
         axios.put(`http://localhost:3000/editPost/${_id}`, {
             user: this.props.post.user._id,
             body: body,
@@ -137,9 +141,13 @@ createPostAction = () => {
             this.setState({
                 body: ''
             })
-            const { index } = this.props; 
+            //get the index value of the form user is editing
+            const { index } = this.props;
+            //update item within list
             this.props.postList.splice(index, 1, response.data)
+            //trigger dispatch to props
             this.props.updatePostList(this.props.postList)
+            //gotoPosts from PostComponent.js: navigate to OpenFourm.js
             this.props.gotoPosts();
         }
         else{
