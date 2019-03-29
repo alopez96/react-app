@@ -34,6 +34,11 @@ class PostComponent extends Component {
     this.deletePost = this.deletePost.bind(this);
     this.gotoPosts = this.gotoPosts.bind(this);
     this.toggleModal = this.toggleModal.bind(this);
+    this.showDelete = this.showDelete.bind(this);
+  }
+
+  showDelete(){
+    this.setState({ showDeleteButton: true })
   }
 
   gotoPosts(){
@@ -147,8 +152,12 @@ class PostComponent extends Component {
                 this.setState({ 
                     isModalVisible: false
                 })
-                // this.props.updateSaleItems(this.props.saleList)
-                this.props.navigation.navigate('PostsScreen')
+                //remove the post at index
+                const { index } = this.props;
+                this.props.postList.splice(index, 1)
+                this.props.updatePostList(this.props.postList)
+                //go to main screen, OpenForum.js
+                this.props.navigation.navigate('ForumScreen')
             }
             else{
                 console.log('error updating user')
@@ -205,10 +214,23 @@ class PostComponent extends Component {
           </View>
       </Card>
       {this.state.verified
-      ?<Button transparent onPress={this.toggleModal}>
+      ?<View>
+      <Button transparent onPress={this.toggleModal}>
         <Text>Edit</Text>
       </Button>
+      <Button transparent danger onPress={this.showDelete}>
+        <Text>Delete</Text>
+      </Button>
+      </View>
       :null}
+      {this.state.showDeleteButton
+      ?<Button danger onPress={this.deletePost}
+      style={{margin:5}}>
+        <Text>Delete!</Text>
+      </Button>
+      :null
+      }
+
 
       <View>
       <Modal isVisible={this.state.isModalVisible}
@@ -226,12 +248,12 @@ class PostComponent extends Component {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    updateSaleItems: (saleList) => dispatch({
-      type: 'SALE_LIST',
-      payload: {
-        saleList
-      }
-    })
+    updatePostList: (postList) => dispatch({
+        type: 'POST_LIST',
+        payload: {
+          postList
+        }
+      })
   }
 }
 
@@ -239,7 +261,8 @@ const mapStateToProps = (state) => {
     return {
         post: state.post,
         user: state.user,
-        saleList: state.saleList
+        postList: state.postList,
+        index: state.index
     }
 }
 
