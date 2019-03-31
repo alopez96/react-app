@@ -169,6 +169,7 @@ class PostComponent extends Component {
 
 
   componentDidMount(){
+    console.log('post', this.props.post)
     const { body, imageurl, postDate, editDate } = this.props.post;
     this.setState({
         body, imageurl, postDate, editDate
@@ -189,10 +190,10 @@ class PostComponent extends Component {
           <Left>
             <TouchableWithoutFeedback>
             <Thumbnail
-              source= {{uri: awsPrefix+this.props.user.imageurl}}/>
+              source= {{uri: awsPrefix+this.props.post.user.imageurl}}/>
             </TouchableWithoutFeedback>
             <Body>
-            <Text style={{fontWeight:"700"}}> {this.props.user.name} </Text>
+            <Text style={{fontWeight:"700"}}> {this.props.post.user.name} </Text>
               <Text note>• {dateString} </Text>
             </Body>
           </Left>
@@ -206,8 +207,9 @@ class PostComponent extends Component {
         </CardItem>
         :null}
         <CardItem>
-          <Body style={{height:100, width:null, flex:1}}>
-            <Text style={styles.eventTitle}>{body}</Text>
+          <Body style={{height:100, width:null, flex:1, 
+          justifyContent: 'center', alignItems: 'center'}}>
+            <Text style={styles.bodyText}>{body}</Text>
           </Body>
         </CardItem>
         <View  style={{ borderBottomColor:'#c0c0c0', borderBottomWidth:1}}>
@@ -279,7 +281,6 @@ const styles = StyleSheet.create({
       borderRadius: 10 
   },
   modalButtons:{
-      
       flexDirection: 'row',
       justifyContent: 'space-between'
   },
@@ -287,5 +288,8 @@ const styles = StyleSheet.create({
       color:'black', 
       fontSize:40,
       margin: 10
+  },
+  bodyText:{
+    textAlign: 'center'
   }
 });

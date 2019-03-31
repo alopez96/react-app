@@ -50,7 +50,7 @@ class OpenForum extends Component {
 
     //update the likeList on db
     axios.put(`http://localhost:3000/likePost/${post._id}`, {
-      user: user._id
+      user: this.props.user._id
     })
     .then(response => {
       if (response.status == 200) {

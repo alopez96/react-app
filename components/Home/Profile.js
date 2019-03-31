@@ -73,6 +73,7 @@ class Profile extends Component {
     })
     .then(response => {
     if (response.status == 200) {
+        console.log('response', response.data)
         this.props.updateUser(response.data.user)
     }
     else{
@@ -208,7 +209,18 @@ const mapStateToProps = (state) => {
     }
 }
 
-export default connect(mapStateToProps)(Profile);
+const mapDispatchToProps = (dispatch) => {
+    return {
+      updateUser: (user) => dispatch({
+        type: 'LOAD_USER',
+        payload: {
+          user
+        }
+      })
+    }
+  }
+
+export default connect(mapStateToProps, mapDispatchToProps)(Profile);
 
 const styles = StyleSheet.create({
     container: {
