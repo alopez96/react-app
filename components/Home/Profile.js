@@ -20,8 +20,10 @@ class Profile extends Component {
             imageurl: '',
             bio: '',
             isModalVisible: false,
-            uri: ''
+            uri: '',
+            verified: false
         }
+        this.fetchUser = this.fetchUser.bind(this);
     }
 
     askPermissionsAsync = async () => {
@@ -98,68 +100,98 @@ class Profile extends Component {
         const { name, email, bio } = this.state;
         axios.put(`http://localhost:3000/user/${_id}/editProfile`, {
         name, email, bio
-    })
-    .then(response => {
-    if (response.status == 200) {
-        this.setState({
-            isModalVisible: false
         })
+        .then(response => {
+        if (response.status == 200) {
+            this.setState({
+                isModalVisible: false
+            })
+            Toast.show({
+                text: 'account updated',
+                duration: 3000,
+                position: "bottom"
+            })
+        }
+        else{
+        console.log('upload error', response.data)
         Toast.show({
-            text: 'account updated',
-            duration: 3000,
-            position: "bottom"
-          })
+            text: response.data,
+            duration: 3000
+        })
+        }
+        })
+        .catch( err => console.log(err));
     }
-    else{
-      console.log('upload error', response.data)
-      Toast.show({
-        text: response.data,
-        duration: 3000
-      })
-    }
-    })
-    .catch( err => console.log(err));
+
+    fetchUser(){
+        const { _id } = this.props.post.user;
+        axios.get(`http://localhost:3000/getUser/${_id}`, {})
+        .then(response => {
+        if (response.status == 200) {
+            this.setState({
+                name: response.data.name,
+                email: response.data.email,
+                bio: response.data.bio,
+                uri: awsPrefix +  response.data.imageurl
+            })
+        }
+        else{
+        console.log('upload error', response.data)
+        Toast.show({
+            text: response.data,
+            duration: 3000
+        })
+        }
+        })
+        .catch( err => console.log(err));
+
     }
 
     async componentDidMount(){
-        this.setState({
-            name: this.props.user.name,
-            email: this.props.user.email,
-            bio: this.props.user.bio,
-            uri: awsPrefix + this.props.user.imageurl
-        })
+        //fetch user from db
+        this.fetchUser();
+        
+        //check if post.user is the user logged in
+        if(this.props.post.user._id == this.props.user._id){
+            this.setState({ verified: true })
+        }
+        else{
+            this.setState({ verified: false })
+        }
     }
 
     render() {
-        const { name, email, bio } = this.state;
+        const { name, email, bio, verified } = this.state;
         return (
             
             <Container style={styles.container}>
             <Root>
             <Content>
-            <Button style={styles.editButton} transparent
+                {verified
+                ?<Button style={styles.editButton} transparent
                 onPress={this.toogleModal}>
                 <Text>Edit</Text>
-            </Button>
+                </Button>
+                :null}
                 <TouchableOpacity style={styles.avatar} 
                     onPress={() => this.onChangePicture()}>
                     <Thumbnail style={styles.image} 
-                    source= {{uri: awsPrefix + this.props.user.imageurl }}/>
+                    source= {{uri: awsPrefix + this.props.post.user.imageurl }}/>
                 </TouchableOpacity>
 
-            <Text style={styles.nameText}>{name}</Text>
-            <Text style={styles.aboutText}>{email}</Text>
-            {bio && (bio.length > 0)
-                ?<Text style={{marginLeft: 10}}>
-                   Bio: <Text style={styles.aboutText}>{bio} </Text>
-                </Text>
-                :null
-            }              
-            </Content>
-            <View>
-                <Modal isVisible={this.state.isModalVisible}
-                style={styles.modalStyle}>
-                <View style={{ flex: 1, margin: 20 }}>
+                <Text style={styles.nameText}>{name}</Text>
+                <Text style={styles.aboutText}>{email}</Text>
+                {bio && (bio.length > 0)
+                    ?<Text style={{marginLeft: 10}}>
+                    Bio: <Text style={styles.aboutText}>{bio} </Text>
+                    </Text>
+                    :null
+                }              
+                </Content>
+                <View>
+                    <Modal isVisible={this.state.isModalVisible}
+                    style={styles.modalStyle}>
+                    <View style={{ flex: 1, margin: 20 }}>
                     <Form>
                     <Item>
                         <Input placeholder="name"
@@ -205,7 +237,8 @@ class Profile extends Component {
 
 const mapStateToProps = (state) => {
     return {
-        user: state.user
+        user: state.user,
+        post: state.post
     }
 }
 

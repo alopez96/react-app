@@ -17,6 +17,15 @@ class OpenForum extends Component {
       loading: false
     };
     this.handleLike = this.handleLike.bind(this);
+    this.gotoUser = this.gotoUser.bind(this);
+  }
+
+  gotoUser(post){
+    //update post selected so that I can reference the user in the post object
+    //from the Profile.js file
+    this.props.updatePost(post)
+    //go to Profile.js
+    this.props.navigation.navigate('ProfileScreen');
   }
 
   handleLike(post, user, index){
@@ -131,7 +140,7 @@ class OpenForum extends Component {
       <Card>
         <CardItem>
           <Left>
-            <TouchableWithoutFeedback>
+            <TouchableWithoutFeedback onPress={()=> this.gotoUser(item)}>
             {newPost
             ?<Thumbnail
               source= {{uri: awsPrefix+this.props.user.imageurl}}/>
