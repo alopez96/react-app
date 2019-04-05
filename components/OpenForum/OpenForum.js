@@ -157,7 +157,7 @@ class OpenForum extends Component {
         </CardItem>
         :null}
         <CardItem>
-          <Body style={{height:100, width:null, flex:1, 
+          <Body style={{marginTop:10, marginBottom:10, width:null, flex:1, 
           justifyContent: 'center', alignItems: 'center'}}>
             <Text style={styles.eventTitle}>{body}</Text>
           </Body>
@@ -165,17 +165,16 @@ class OpenForum extends Component {
         <CardItem>
         {hasLiked
         ?<Icon onPress={() => this.handleLike(item, item.user, index)}
-        name="ios-heart" style={{marginLeft: 50, color:'red', marginBottom: 5,}}/>
+        name="ios-add" style={{marginLeft: 50, color:'red'}}/>
         :<Icon onPress={() => this.handleLike(item, item.user, index)}
-        name="ios-heart" style={{marginLeft: 50, marginBottom: 5,}}/>
+        name="ios-add" style={{marginLeft: 50}}/>
         }
         {likeCount
         ?<Text style={{marginBottom: 6}} >{likeCount}</Text>
         :null
         } 
         </CardItem>
-        <View  style={{ borderBottomColor:'#c0c0c0', borderBottomWidth:1}}>
-          </View>
+        {/* <View  style={{ borderBottomColor:'#c0c0c0', borderBottomWidth:1}}></View> */}
       </Card>
       </TouchableOpacity>
       );
