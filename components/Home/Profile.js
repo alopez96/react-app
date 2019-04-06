@@ -23,7 +23,9 @@ class Profile extends Component {
             uri: '',
             verified: false,
             loading: false,
-            posts: []
+            posts: [],
+            items: [],
+            isShowPosts: false
         }
         this.fetchUser = this.fetchUser.bind(this);
         this.viewItems = this.viewItems.bind(this);
@@ -31,6 +33,7 @@ class Profile extends Component {
     }
 
     viewPosts(){
+        this.setState({isShowPosts: true})
         const { _id } = this.props.post.user;
         axios.get(`http://localhost:3000/userPosts/${_id}`, {})
         .then(response => {
@@ -80,7 +83,44 @@ class Profile extends Component {
     }
 
     viewItems(){
-        console.log('view items')
+        this.setState({isShowPosts: false})
+        const { _id } = this.props.post.user;
+        axios.get(`http://localhost:3000/userSales/${_id}`, {})
+        .then(response => {
+        if (response.status == 200) {
+            this.setState({items: response.data})
+        }
+        else{
+        console.log('upload error', response.data)
+        Toast.show({
+            text: response.data,
+            duration: 3000
+        })
+        }
+        })
+        .catch( err => console.log(err));
+    }
+
+    //render list of sales (this.state.items)
+    renderItemList = ({item, index}) => {
+        if (!item) {
+            return null;
+          }
+          //deconstruct sale item
+          const { postDate, title, image } = item;
+          const dateString = new Date(postDate).toString().substring(0, 10)
+        return (
+            <TouchableWithoutFeedback>
+            <View>
+            <Image source={{ uri: awsPrefix+image }} />
+            <View style={{ margin: 2 }}>
+                <Text allowFontScaling numberOfLines={3}
+                style={styles.eventTitle}>{title}</Text>
+            </View>
+            <Text>• {dateString}</Text>
+            </View>
+        </TouchableWithoutFeedback>
+        );
     }
 
     askPermissionsAsync = async () => {
@@ -260,30 +300,45 @@ class Profile extends Component {
                         </Button>
                         </View>
                     </View>
-                
-                    <View style={styles.modalButtons}>
-                    <Content>
+
+                    {this.state.isShowPosts
+                    ?<Content>
+                    <ScrollView
+                    refreshControl={<RefreshControl
+                    refreshing={this.state.loading}
+                    onRefresh={this.viewPosts}
+                    />}
+                    >
+                    <FlatList
+                        data={this.state.posts.slice(0, 10)}
+                        renderItem={this.renderPostList}
+                        horizontal={false}
+                        numColumns={1}
+                        keyExtractor={item => item._id}
+                        extraData={this.state}
+                    />
+                    </ScrollView>
+                    </Content>
+                    
+                    :<Content>
                     <ScrollView
                     refreshControl={<RefreshControl
                     refreshing={this.state.loading}
                     onRefresh={this.viewItems}
                     />}
                     >
-                        <FlatList
-                            data={this.state.posts.slice(0, 10)}
-                            renderItem={this.renderPostList}
-                            horizontal={false}
-                            numColumns={1}
-                            keyExtractor={item => item._id}
-                            extraData={this.state}
-                        />
-                        </ScrollView>
-                        </Content>
-                        <View>
-                            <Text>Left</Text>
-                        </View>
-                            
-                    </View>             
+                    <FlatList
+                        data={this.state.items.slice(0, 10)}
+                        renderItem={this.renderItemList}
+                        horizontal={false}
+                        numColumns={1}
+                        keyExtractor={item => item._id}
+                        extraData={this.state}
+                    />
+                    </ScrollView>
+                    </Content>
+                    }
+                                  
                 </Content>
                 <View>
                     <Modal isVisible={this.state.isModalVisible}
