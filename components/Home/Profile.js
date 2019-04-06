@@ -1,10 +1,10 @@
 import React, { Component } from 'react';
-import { View, StyleSheet,
-    TouchableOpacity,KeyboardAvoidingView } from 'react-native';
+import { StyleSheet, TouchableOpacity, ScrollView, FlatList, View, Image,
+    TouchableWithoutFeedback, RefreshControl, Dimensions, Animated } from 'react-native';
 import { connect } from 'react-redux';
 import Modal from 'react-native-modal';
 import { Thumbnail, Form, Item, Input, Toast, Button, Text, Content,
-     Icon, Container, Root } from 'native-base';
+     Icon, Container, Root, Card, CardItem, Body } from 'native-base';
 import { RNS3 } from 'react-native-aws3';
 import { ImagePicker, Permissions } from 'expo';
 import { myAccessKey, mySecretKey, awsPrefix } from './../../s3';
@@ -21,9 +21,66 @@ class Profile extends Component {
             bio: '',
             isModalVisible: false,
             uri: '',
-            verified: false
+            verified: false,
+            loading: false,
+            posts: []
         }
         this.fetchUser = this.fetchUser.bind(this);
+        this.viewItems = this.viewItems.bind(this);
+        this.viewPosts = this.viewPosts.bind(this);
+    }
+
+    viewPosts(){
+        const { _id } = this.props.post.user;
+        axios.get(`http://localhost:3000/userPosts/${_id}`, {})
+        .then(response => {
+        if (response.status == 200) {
+            this.setState({posts: response.data})
+        }
+        else{
+        console.log('upload error', response.data)
+        Toast.show({
+            text: response.data,
+            duration: 3000
+        })
+        }
+        })
+        .catch( err => console.log(err));
+    }
+
+    //render list of posts (this.state.posts)
+    renderPostList = ({item, index}) => {
+        //descture each post
+        const { postDate, body, imageurl } = item;
+        //convert date to readable string
+        const dateString = new Date(postDate).toString().substring(0, 10)
+        return (
+            <TouchableWithoutFeedback>
+            <Card>
+                <CardItem>
+                    <Text note>• {dateString}</Text>
+                </CardItem>
+                {imageurl.length > 10
+                ?<CardItem cardBody>
+                <TouchableWithoutFeedback>
+                <Thumbnail square style={{height:200, width:null, flex:1}}
+                source={{ uri: awsPrefix+imageurl }}/>
+                </TouchableWithoutFeedback>
+                </CardItem>
+                :null}
+                <CardItem>
+                <Body style={{marginTop:10, marginBottom:10, width:null, flex:1, 
+                justifyContent: 'center', alignItems: 'center'}}>
+                    <Text>{body}</Text>
+                </Body>
+                </CardItem>
+            </Card>
+            </TouchableWithoutFeedback>
+        );
+    }
+
+    viewItems(){
+        console.log('view items')
     }
 
     askPermissionsAsync = async () => {
@@ -178,7 +235,7 @@ class Profile extends Component {
                     <Thumbnail style={styles.image} 
                     source= {{uri: awsPrefix + this.props.post.user.imageurl }}/>
                 </TouchableOpacity>
-
+                <View style={{flexDirection: 'column'}}>
                 <Text style={styles.nameText}>{name}</Text>
                 <Text style={styles.aboutText}>{email}</Text>
                 {bio && (bio.length > 0)
@@ -186,7 +243,47 @@ class Profile extends Component {
                     Bio: <Text style={styles.aboutText}>{bio} </Text>
                     </Text>
                     :null
-                }              
+                }    
+                </View>          
+                </Content>
+
+                <Content>
+                <View >
+                <View style={styles.bottomHalf}>
+                        <Button style={styles.mainButtons}
+                        onPress={this.viewPosts}>
+                            <Text>Posts</Text>
+                        </Button>
+                        <Button style={styles.mainButtons}
+                        onPress={this.viewItems}>
+                            <Text>Items</Text>
+                        </Button>
+                        </View>
+                    </View>
+                
+                    <View style={styles.modalButtons}>
+                    <Content>
+                    <ScrollView
+                    refreshControl={<RefreshControl
+                    refreshing={this.state.loading}
+                    onRefresh={this.viewItems}
+                    />}
+                    >
+                        <FlatList
+                            data={this.state.posts.slice(0, 10)}
+                            renderItem={this.renderPostList}
+                            horizontal={false}
+                            numColumns={1}
+                            keyExtractor={item => item._id}
+                            extraData={this.state}
+                        />
+                        </ScrollView>
+                        </Content>
+                        <View>
+                            <Text>Left</Text>
+                        </View>
+                            
+                    </View>             
                 </Content>
                 <View>
                     <Modal isVisible={this.state.isModalVisible}
@@ -225,9 +322,9 @@ class Profile extends Component {
                             <Text> Submit </Text>
                         </Button>
                     </View>
+                    </View>
+                    </Modal>
                 </View>
-                </Modal>
-            </View>
             </Root>
             </Container>
     
@@ -310,5 +407,15 @@ const styles = StyleSheet.create({
         color:'black', 
         fontSize:40,
         margin: 10
+    },
+    mainButtons:{
+        fontSize:40,
+        margin: 10,
+        width: 100,
+        justifyContent: 'center'
+    },
+    bottomHalf:{
+        flexDirection: 'row',
+        justifyContent: 'space-between'
     }
 });
