@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import { StyleSheet, TouchableOpacity, ScrollView, FlatList, View, Image,
-    TouchableWithoutFeedback, RefreshControl, Dimensions, Animated } from 'react-native';
+    TouchableWithoutFeedback, RefreshControl } from 'react-native';
 import { connect } from 'react-redux';
 import Modal from 'react-native-modal';
 import { Thumbnail, Form, Item, Input, Toast, Button, Text, Content,
@@ -10,6 +10,7 @@ import { ImagePicker, Permissions } from 'expo';
 import { myAccessKey, mySecretKey, awsPrefix } from './../../s3';
 import v1 from 'uuid/v1';
 import axios from 'axios';
+import screenWidth from './../Dimensions';
 
 class Profile extends Component {
     constructor() {
@@ -35,20 +36,23 @@ class Profile extends Component {
     viewPosts(){
         this.setState({isShowPosts: true})
         const { _id } = this.props.post.user;
-        axios.get(`http://localhost:3000/userPosts/${_id}`, {})
-        .then(response => {
-        if (response.status == 200) {
-            this.setState({posts: response.data})
+        //only fetch if have not fetched
+        if(this.state.posts.length == 0){
+            axios.get(`http://localhost:3000/userPosts/${_id}`, {})
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({posts: response.data})
+                }
+                else{
+                    console.log('upload error', response.data)
+                    Toast.show({
+                        text: response.data,
+                        duration: 3000
+                    })
+                }
+            })
+            .catch( err => console.log(err));
         }
-        else{
-        console.log('upload error', response.data)
-        Toast.show({
-            text: response.data,
-            duration: 3000
-        })
-        }
-        })
-        .catch( err => console.log(err));
     }
 
     //render list of posts (this.state.posts)
@@ -85,20 +89,22 @@ class Profile extends Component {
     viewItems(){
         this.setState({isShowPosts: false})
         const { _id } = this.props.post.user;
-        axios.get(`http://localhost:3000/userSales/${_id}`, {})
-        .then(response => {
-        if (response.status == 200) {
-            this.setState({items: response.data})
+        if(this.state.items.length == 0){
+            axios.get(`http://localhost:3000/userSales/${_id}`, {})
+            .then(response => {
+                if (response.status == 200) {
+                    this.setState({items: response.data})
+                }
+                else{
+                    console.log('upload error', response.data)
+                    Toast.show({
+                        text: response.data,
+                        duration: 3000
+                    })
+                }
+            })
+            .catch( err => console.log(err));
         }
-        else{
-        console.log('upload error', response.data)
-        Toast.show({
-            text: response.data,
-            duration: 3000
-        })
-        }
-        })
-        .catch( err => console.log(err));
     }
 
     //render list of sales (this.state.items)
@@ -111,13 +117,13 @@ class Profile extends Component {
           const dateString = new Date(postDate).toString().substring(0, 10)
         return (
             <TouchableWithoutFeedback>
-            <View>
-            <Image source={{ uri: awsPrefix+image }} />
-            <View style={{ margin: 2 }}>
+            <View  style={{flexDirection:'row', marginTop:20}}>
+            <Thumbnail source={{ uri: awsPrefix+image }} />
+            <View style={{flexDirection:'column', justifyContent: 'center'}}>
                 <Text allowFontScaling numberOfLines={3}
-                style={styles.eventTitle}>{title}</Text>
-            </View>
-            <Text>• {dateString}</Text>
+                    style={styles.eventTitle}>{title}</Text>
+                <Text>• {dateString}</Text>
+                </View>
             </View>
         </TouchableWithoutFeedback>
         );
@@ -280,7 +286,7 @@ class Profile extends Component {
                 <Text style={styles.aboutText}>{email}</Text>
                 {bio && (bio.length > 0)
                     ?<Text style={{marginLeft: 10}}>
-                    Bio: <Text style={styles.aboutText}>{bio} </Text>
+                    <Text style={styles.aboutText}>Bio: {bio} </Text>
                     </Text>
                     :null
                 }    
@@ -288,8 +294,7 @@ class Profile extends Component {
                 </Content>
 
                 <Content>
-                <View >
-                <View style={styles.bottomHalf}>
+                    <View style={styles.bottomHalf}>
                         <Button style={styles.mainButtons}
                         onPress={this.viewPosts}>
                             <Text>Posts</Text>
@@ -298,11 +303,10 @@ class Profile extends Component {
                         onPress={this.viewItems}>
                             <Text>Items</Text>
                         </Button>
-                        </View>
                     </View>
-
+            
                     {this.state.isShowPosts
-                    ?<Content>
+                    ?<Content style={{flex:1}}>
                     <ScrollView
                     refreshControl={<RefreshControl
                     refreshing={this.state.loading}
