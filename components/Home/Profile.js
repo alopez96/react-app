@@ -26,7 +26,9 @@ class Profile extends Component {
             loading: false,
             posts: [],
             items: [],
-            isShowPosts: false
+            isShowPosts: false,
+            isPostFetched: false,
+            isItemFetched: false
         }
         this.fetchUser = this.fetchUser.bind(this);
         this.viewItems = this.viewItems.bind(this);
@@ -37,11 +39,14 @@ class Profile extends Component {
         this.setState({isShowPosts: true})
         const { _id } = this.props.post.user;
         //only fetch if have not fetched
-        if(this.state.posts.length == 0){
+        if(!this.state.isPostFetched){
             axios.get(`http://localhost:3000/userPosts/${_id}`, {})
             .then(response => {
                 if (response.status == 200) {
-                    this.setState({posts: response.data})
+                    this.setState({
+                        posts: response.data, 
+                        isPostFetched: true
+                    })
                 }
                 else{
                     console.log('upload error', response.data)
@@ -89,11 +94,14 @@ class Profile extends Component {
     viewItems(){
         this.setState({isShowPosts: false})
         const { _id } = this.props.post.user;
-        if(this.state.items.length == 0){
+        if(!this.state.isItemFetched){
             axios.get(`http://localhost:3000/userSales/${_id}`, {})
             .then(response => {
                 if (response.status == 200) {
-                    this.setState({items: response.data})
+                    this.setState({
+                        items: response.data,
+                        isItemFetched: true
+                    })
                 }
                 else{
                     console.log('upload error', response.data)

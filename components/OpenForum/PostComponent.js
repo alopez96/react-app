@@ -26,7 +26,10 @@ class PostComponent extends Component {
       isModalVisible: false,
       imageUpdating: false,
       verified: false,
-      showDeleteButton: false
+      showDeleteButton: false,
+      name: '',
+      imageurl: '',
+      isNewPost: false
     };
     this.deletePost = this.deletePost.bind(this);
     this.onChangePicture = this.onChangePicture.bind(this);
@@ -178,22 +181,36 @@ class PostComponent extends Component {
     if(this.props.user._id == this.props.post.user._id){
       this.setState({ verified: true })
     }
+    //if new post, no user object, no user._id
+    if(!this.props.post.user._id){
+      //set newPost state to true
+      this.setState({isNewPost: true})
+      
+    }
   }
 
   render() {
     const { imageurl, body, postDate, editDate } = this.state;
     const dateString = new Date(postDate).toString().substring(0, 10)
+    console.log('name', this.props.user.name)
     return (
       <View>
       <Card>
         <CardItem>
           <Left>
             <TouchableWithoutFeedback>
-            <Thumbnail
-              source= {{uri: awsPrefix+this.props.post.user.imageurl}}/>
+              {!this.state.isNewPost
+              ?<Thumbnail
+                source= {{uri: awsPrefix+this.props.post.user.imageurl}}/>
+              :<Thumbnail
+                source= {{uri: awsPrefix+this.props.user.imageurl}}/>
+              }
             </TouchableWithoutFeedback>
             <Body>
-            <Text style={{fontWeight:"700"}}> {this.props.post.user.name} </Text>
+              {this.state.isNewPost
+              ?<Text style={{fontWeight:"700"}}> {this.props.user.name} </Text>
+              :<Text style={{fontWeight:"700"}}> {this.props.post.user.name} </Text>
+              }
               <Text note>• {dateString} </Text>
             </Body>
           </Left>
